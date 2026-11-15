@@ -5,12 +5,24 @@ from seed_data import seed_database
 
 app = create_app()
 
-if __name__ == '__main__':
-    with app.app_context():
-        # Ensure database tables exist and seed demo records if new
-        db.create_all()
-        seed_database()
 
+def init_app_database(application):
+    """
+    Ensures database tables and initial seed records exist.
+    Executes safely in both local execution and Vercel serverless environments.
+    """
+    with application.app_context():
+        try:
+            db.create_all()
+            seed_database(app=application)
+        except Exception as e:
+            application.logger.warning(f"Database auto-initialization skipped or failed: {e}")
+
+
+# Initialize database tables and seed demo accounts on application startup
+init_app_database(app)
+
+if __name__ == '__main__':
     print("=" * 65)
     print("   SECOND SERVE: Smart Food Waste Rescue & Redistribution System")
     print("   Application running locally on http://127.0.0.1:5000")

@@ -1,0 +1,16 @@
+[project]
+name = "second-serve"
+version = "1.0.0"
+description = "Second Serve: Smart Food Waste Rescue & Redistribution System"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "Flask>=3.0.0",
+    "Flask-SQLAlchemy>=3.1.0",
+    "Flask-Login>=0.6.3",
+    "Werkzeug>=3.0.0",
+    "psycopg2-binary>=2.9.9",
+]
+
+[tool.vercel]
+entrypoint = "run:app"

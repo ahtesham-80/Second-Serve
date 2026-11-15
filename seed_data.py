@@ -5,15 +5,24 @@ from app.extensions import db
 from app.models import User, FoodListing, Claim, AuditLog
 
 
-def seed_database():
-    app = create_app()
+def seed_database(app=None):
+    from flask import current_app, has_app_context
+    if app is None:
+        if has_app_context():
+            app = current_app._get_current_object()
+        else:
+            app = create_app()
+
     with app.app_context():
-        # Recreate tables cleanly
+        # Ensure tables exist
         db.create_all()
 
         # Check if already seeded
-        if User.query.filter_by(email='admin@secondserve.org').first():
-            print("Database already contains seed accounts. Skipping initialization.")
+        try:
+            if User.query.filter_by(email='admin@secondserve.org').first():
+                print("Database already contains seed accounts. Skipping initialization.")
+                return
+        except Exception:
             return
 
         print("Seeding Second Serve initial demo accounts and realistic sample records...")
