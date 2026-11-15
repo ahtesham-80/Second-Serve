@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}All Claims Oversight{% endblock %}
+{% block page_title %}Platform Claims & Collection Monitoring{% endblock %}
+
+{% block breadcrumb %}
+  <span>Administration</span>
+  <i data-lucide="chevron-right" style="width: 12px; height: 12px; color: #9CA3AF;"></i>
+  <span style="color: #111827; font-weight: 600;">Claims</span>
+{% endblock %}
+
+{% block content %}
+<!-- Status Filter Toolbar -->
+<div class="filter-toolbar">
+  <div class="d-flex flex-wrap gap-2">
+    <a href="{{ url_for('admin.claims', status='ALL') }}" class="btn btn-sm {% if current_filter == 'ALL' %}btn-dark{% else %}btn-outline-secondary{% endif %}">
+      All Claims
+    </a>
+    <a href="{{ url_for('admin.claims', status='PENDING') }}" class="btn btn-sm {% if current_filter == 'PENDING' %}btn-warning text-dark{% else %}btn-outline-secondary{% endif %}">
+      Step 1: Pending
+    </a>
+    <a href="{{ url_for('admin.claims', status='ACCEPTED') }}" class="btn btn-sm {% if current_filter == 'ACCEPTED' %}btn-info text-white{% else %}btn-outline-secondary{% endif %}">
+      Step 2: Accepted
+    </a>
+    <a href="{{ url_for('admin.claims', status='READY_FOR_COLLECTION') }}" class="btn btn-sm {% if current_filter == 'READY_FOR_COLLECTION' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+      Step 3: Ready for Pickup
+    </a>
+    <a href="{{ url_for('admin.claims', status='COLLECTED') }}" class="btn btn-sm {% if current_filter == 'COLLECTED' %}btn-success{% else %}btn-outline-secondary{% endif %}">
+      Step 4: Completed
+    </a>
+    <a href="{{ url_for('admin.claims', status='REJECTED') }}" class="btn btn-sm {% if current_filter == 'REJECTED' %}btn-danger{% else %}btn-outline-secondary{% endif %}">
+      Rejected
+    </a>
+    <a href="{{ url_for('admin.claims', status='CANCELLED') }}" class="btn btn-sm {% if current_filter == 'CANCELLED' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">
+      Cancelled
+    </a>
+  </div>
+</div>
+
+<div class="ss-card">
+  <div class="ss-card-body p-0">
+    {% if claims %}
+      <div class="table-responsive">
+        <table class="ss-table">
+          <thead>
+            <tr>
+              <th>Claim ID</th>
+              <th>Food Item</th>
+              <th>Donor Organization</th>
+              <th>Claiming NGO</th>
+              <th>Pipeline Status</th>
+              <th>Claim Date</th>
+              <th>Concluded Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in claims %}
+              <tr>
+                <td><strong>#{{ c.id }}</strong></td>
+                <td>
+                  <div style="font-weight: 700; color: #111827;">{{ c.listing.title }}</div>
+                  <div style="font-size: 11px; color: #6B7280;">{{ c.listing.quantity|int if c.listing.quantity == c.listing.quantity|int else c.listing.quantity }} {{ c.listing.unit }} • {{ c.listing.locality }}</div>
+                </td>
+                <td>
+                  <div style="font-weight: 600;">{{ c.listing.donor.organization_name or c.listing.donor.name }}</div>
+                  <div style="font-size: 11px; color: #6B7280;">{{ c.listing.donor.phone }}</div>
+                </td>
+                <td>
+                  <div style="font-weight: 600;">{{ c.recipient.organization_name or c.recipient.name }}</div>
+                  <div style="font-size: 11px; color: #6B7280;">{{ c.recipient.phone }}</div>
+                </td>
+                <td>
+                  {% if c.status == 'PENDING' %}
+                    <span class="pill-status pill-pending">1: Pending</span>
+                  {% elif c.status == 'ACCEPTED' %}
+                    <span class="pill-status pill-ready">2: Accepted</span>
+                  {% elif c.status == 'READY_FOR_COLLECTION' %}
+                    <span class="pill-status pill-available">3: Ready for Pickup</span>
+                  {% elif c.status == 'COLLECTED' %}
+                    <span class="pill-status pill-collected">4: Collected</span>
+                  {% elif c.status == 'REJECTED' %}
+                    <span class="pill-status pill-rejected">Rejected</span>
+                  {% else %}
+                    <span class="pill-status pill-cancelled">Cancelled</span>
+                  {% endif %}
+                </td>
+                <td>{{ c.created_at|datetimeformat }}</td>
+                <td>
+                  {% if c.collected_at %}
+                    <span class="text-success font-weight-bold">{{ c.collected_at|datetimeformat }}</span>
+                  {% elif c.status in ['REJECTED', 'CANCELLED'] %}
+                    <span style="font-size: 11px; color: #DC2626;">{{ c.updated_at|dateonly }}</span>
+                  {% else %}
+                    <span style="font-size: 12px; color: #9CA3AF;">In Progress</span>
+                  {% endif %}
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-state-icon">
+          <i data-lucide="clipboard-x" style="width: 28px; height: 28px;"></i>
+        </div>
+        <h3 class="empty-state-title">No Claims Found</h3>
+        <p class="empty-state-desc">No claims match status "{{ current_filter }}".</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

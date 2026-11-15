@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Create Account | Second Serve</title>
+  
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  <style>
+    .auth-container-wide {
+      width: 100%;
+      max-width: 1040px;
+      margin: auto;
+      background: #FFFFFF;
+      border-radius: 16px;
+      border: 1px solid #E5E7EB;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08);
+      overflow: hidden;
+      position: relative;
+    }
+    .auth-left-visual {
+      background: linear-gradient(180deg, rgba(17, 24, 39, 0.8) 0%, rgba(17, 24, 39, 0.95) 100%),
+                  url("{{ url_for('static', filename='images/hero/community_feeding.jpg') }}") center/cover no-repeat;
+      color: #FFFFFF;
+      padding: 44px 36px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 100%;
+    }
+    .auth-right-form {
+      padding: 36px 36px;
+    }
+    .step-pill {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body class="auth-wrapper py-4">
+
+  <!-- Flash Toast Notifications -->
+  <div class="flash-toasts-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="toast-alert alert-{{ category if category != 'error' else 'danger' }}">
+            <i data-lucide="{% if category == 'success' %}check-circle{% elif category == 'danger' %}alert-circle{% elif category == 'warning' %}alert-triangle{% else %}info{% endif %}" style="width: 18px; height: 18px; flex-shrink: 0; color: {% if category == 'success' %}#10B981{% elif category == 'warning' %}#F59E0B{% elif category == 'danger' %}#FF0000{% else %}#3B82F6{% endif %};"></i>
+            <div style="flex: 1; font-size: 13px; font-weight: 500; color: #111827;">{{ message }}</div>
+            <button type="button" class="btn-close" style="font-size: 10px;" onclick="this.parentElement.remove();"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <div class="container">
+    <div class="auth-container-wide">
+      <!-- Top Brand Red Accent Bar -->
+      <div style="height: 5px; background: #FF0000; width: 100%;"></div>
+
+      <div class="row g-0">
+        
+        <!-- Left Visual Side (Mission & Network Benefits) -->
+        <div class="col-lg-4 d-none d-lg-block">
+          <div class="auth-left-visual">
+            <div>
+              <div class="d-flex align-items-center gap-2 mb-4">
+                <div style="width: 36px; height: 36px; background: #FF0000; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #FFFFFF;">
+                  <i data-lucide="utensils" style="width: 20px; height: 20px;"></i>
+                </div>
+                <div>
+                  <div style="font-size: 18px; font-weight: 800; color: #FFFFFF; line-height: 1.1;">Second Serve</div>
+                  <div style="font-size: 10.5px; font-weight: 700; color: #FECACA; text-transform: uppercase; letter-spacing: 0.05em;">Food Waste Rescue</div>
+                </div>
+              </div>
+
+              <span class="badge mb-3" style="background: rgba(255, 0, 0, 0.35); border: 1px solid #FF0000; color: #FFFFFF; font-size: 11px; font-weight: 700; padding: 5px 12px; border-radius: 9999px;">
+                ● Local Redistribution Community
+              </span>
+
+              <h2 style="font-size: 23px; font-weight: 800; line-height: 1.3; color: #FFFFFF; margin-bottom: 14px;">
+                Join the Network Saving Meals Daily.
+              </h2>
+              <p style="font-size: 13.5px; color: #D1D5DB; line-height: 1.55; margin-bottom: 24px;">
+                Whether you are a commercial kitchen with edible surplus or a registered charity providing relief, Second Serve makes collection painless.
+              </p>
+
+              <!-- Features breakdown -->
+              <div class="d-flex flex-column gap-2">
+                <div class="step-pill d-flex align-items-center gap-2">
+                  <i data-lucide="shield-check" style="width: 16px; height: 16px; color: #10B981; flex-shrink: 0;"></i>
+                  <span><strong>Verified NGOs:</strong> Administrative review protects donors & food quality.</span>
+                </div>
+                <div class="step-pill d-flex align-items-center gap-2">
+                  <i data-lucide="zap" style="width: 16px; height: 16px; color: #FF0000; flex-shrink: 0;"></i>
+                  <span><strong>Smart Matches:</strong> Automated proximity & dietary suitability matching.</span>
+                </div>
+                <div class="step-pill d-flex align-items-center gap-2">
+                  <i data-lucide="lock" style="width: 16px; height: 16px; color: #F59E0B; flex-shrink: 0;"></i>
+                  <span><strong>Zero Clashing Claims:</strong> One verified claim locks the listing atomically.</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="font-size: 12px; color: #9CA3AF; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 16px; margin-top: 30px;">
+              <a href="{{ url_for('main.landing') }}" style="color: #FFFFFF; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                <i data-lucide="arrow-left" style="width: 14px; height: 14px;"></i> Back to Public Homepage
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Form Side -->
+        <div class="col-lg-8">
+          <div class="auth-right-form">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div>
+                <h1 style="font-size: 22px; font-weight: 800; color: #111827; margin-bottom: 2px;">Create an Account</h1>
+                <p style="font-size: 13px; color: #6B7280; margin-bottom: 0;">Select your role to start donating or receiving surplus food.</p>
+              </div>
+              <a href="{{ url_for('main.landing') }}" class="btn btn-sm btn-outline-secondary d-lg-none" style="font-size: 12px;">
+                Home
+              </a>
+            </div>
+
+            <!-- Registration Form -->
+            <form method="POST" action="{{ url_for('auth.register') }}">
+              <!-- Interactive Role Selector Toggle Cards -->
+              <label class="form-label mb-2" style="font-size: 12.5px; font-weight: 700; color: #374151;">Select Account Type</label>
+              <div class="role-toggle-grid mb-3">
+                <div class="role-toggle-card {% if role != 'NGO' %}active{% endif %}" id="roleToggleDonor">
+                  <div class="role-toggle-icon">
+                    <i data-lucide="utensils" style="width: 18px; height: 18px;"></i>
+                  </div>
+                  <div>
+                    <div style="font-size: 13px; font-weight: 700; color: #111827;">Food Donor</div>
+                    <div style="font-size: 11px; color: #6B7280;">Restaurants, caterers, canteens</div>
+                  </div>
+                </div>
+
+                <div class="role-toggle-card {% if role == 'NGO' %}active{% endif %}" id="roleToggleNGO">
+                  <div class="role-toggle-icon">
+                    <i data-lucide="hand-heart" style="width: 18px; height: 18px;"></i>
+                  </div>
+                  <div>
+                    <div style="font-size: 13px; font-weight: 700; color: #111827;">NGO / Charity</div>
+                    <div style="font-size: 11px; color: #6B7280;">Redistribution trusts, shelters</div>
+                  </div>
+                </div>
+              </div>
+              <input type="hidden" name="role" id="roleInput" value="{{ role or 'DONOR' }}">
+
+              <!-- Dynamic Organization Name -->
+              <div class="mb-3" id="orgNameGroup">
+                <label for="organization_name" class="form-label" style="font-size: 13px; font-weight: 600; color: #374151;">
+                  {% if role == 'NGO' %}NGO / Charitable Trust Name{% else %}Restaurant / Business / Donor Name{% endif %} <span class="text-danger">*</span>
+                </label>
+                <input type="text" class="form-control" id="organization_name" name="organization_name" value="{{ organization_name or '' }}" placeholder="e.g., Central Kitchens or Feeding Hope Trust" required style="border-color: #E5E7EB; font-size: 13.5px;">
+              </div>
+
+              <!-- Contact Person & Email Row -->
+              <div class="row g-2 mb-3">
+                <div class="col-md-6">
+                  <label for="name" class="form-label" style="font-size: 13px; font-weight: 600; color: #374151;">Contact Person Name <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="name" name="name" value="{{ name or '' }}" placeholder="First & Last Name" required style="border-color: #E5E7EB; font-size: 13.5px;">
+                </div>
+                <div class="col-md-6">
+                  <label for="phone" class="form-label" style="font-size: 13px; font-weight: 600; color: #374151;">Phone Number <span class="text-danger">*</span></label>
+                  <input type="tel" class="form-control" id="phone" name="phone" value="{{ phone or '' }}" placeholder="+91 98765 43210" required style="border-color: #E5E7EB; font-size: 13.5px;">
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <label for="email" class="form-label" style="font-size: 13px; font-weight: 600; color: #374151;">Official Email Address <span class="text-danger">*</span></label>
+                <input type="email" class="form-control" id="email" name="email" value="{{ email or '' }}" placeholder="contact@organization.org" required style="border-color: #E5E7EB; font-size: 13.5px;">
+              </div>
+
+              <!-- Location Fields for Smart Matching -->
+              <div class="mb-3">
+                <label for="address" class="form-label" style="font-size: 13px; font-weight: 600; color: #374151;">Operating / Street Address <span class="text-danger">*</span></label>
+                <input type="text" class="form-control" id="address" name="address" value="{{ address or '' }}" placeholder="Street number, building name, landmark" required style="border-color: #E5E7EB; font-size: 13.5px;">
+              </div>
+
+              <div class="row g-2 mb-3">
+                <div class="col-md-4">
+                  <label for="locality" class="form-label" style="font-size: 13px; font-weight: 600; color: #374151;">Locality / Area <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="locality" name="locality" value="{{ locality or '' }}" placeholder="e.g. Indiranagar" required style="border-color: #E5E7EB; font-size: 13.5px;">
+                </div>
+                <div class="col-md-4">
+                  <label for="city" class="form-label" style="font-size: 13px; font-weight: 600; color: #374151;">City <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="city" name="city" value="{{ city or '' }}" placeholder="e.g. Bengaluru" required style="border-color: #E5E7EB; font-size: 13.5px;">
+                </div>
+                <div class="col-md-4">
+                  <label for="district" class="form-label" style="font-size: 13px; font-weight: 600; color: #374151;">District <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="district" name="district" value="{{ district or '' }}" placeholder="e.g. Bengaluru Urban" required style="border-color: #E5E7EB; font-size: 13.5px;">
+                </div>
+              </div>
+
+              <!-- Password Row -->
+              <div class="row g-2 mb-4">
+                <div class="col-md-6">
+                  <label for="password" class="form-label" style="font-size: 13px; font-weight: 600; color: #374151;">Password <span class="text-danger">*</span></label>
+                  <input type="password" class="form-control" id="password" name="password" placeholder="At least 6 characters" required style="border-color: #E5E7EB; font-size: 13.5px;">
+                </div>
+                <div class="col-md-6">
+                  <label for="confirm_password" class="form-label" style="font-size: 13px; font-weight: 600; color: #374151;">Confirm Password <span class="text-danger">*</span></label>
+                  <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="Repeat password" required style="border-color: #E5E7EB; font-size: 13.5px;">
+                </div>
+              </div>
+
+              <button type="submit" class="btn-ss-primary w-100 py-2 mb-3" style="font-size: 14.5px; font-weight: 700;">
+                <i data-lucide="user-check" style="width: 18px; height: 18px;"></i>
+                <span>Complete Registration</span>
+              </button>
+            </form>
+
+            <div class="d-flex justify-content-between align-items-center pt-2 border-top" style="border-color: #F3F4F6; font-size: 13px;">
+              <span style="color: #6B7280;">Already registered?</span>
+              <a href="{{ url_for('auth.login') }}" style="font-weight: 700; color: #FF0000; text-decoration: none;">Sign In &rarr;</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/lucide/lucide.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

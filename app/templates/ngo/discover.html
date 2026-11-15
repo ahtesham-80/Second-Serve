@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}Discover Surplus Food{% endblock %}
+{% block page_title %}Surplus Food Discovery{% endblock %}
+
+{% block breadcrumb %}
+  <span>NGO Workspace</span>
+  <i data-lucide="chevron-right" style="width: 12px; height: 12px; color: #9CA3AF;"></i>
+  <span style="color: #111827; font-weight: 600;">Discover</span>
+{% endblock %}
+
+{% block header_actions %}
+  <a href="{{ url_for('ngo.matches') }}" class="btn-ss-outline">
+    <i data-lucide="git-compare-arrows" style="width: 18px; height: 18px; color: #FF0000;"></i>
+    <span>View Smart Matches</span>
+  </a>
+{% endblock %}
+
+{% block content %}
+<!-- Filter & Sort Bar (Clean Single Horizontal Toolbar) -->
+<form method="GET" action="{{ url_for('ngo.discover') }}">
+  <div class="filter-toolbar">
+    <!-- Search Query Input -->
+    <div class="filter-search-input">
+      <i data-lucide="search" style="width: 16px; height: 16px;"></i>
+      <input type="text" name="q" class="form-control" placeholder="Search food by title, description..." value="{{ q or '' }}" style="font-size: 13px;">
+    </div>
+
+    <!-- Category Dropdown -->
+    <div class="filter-select">
+      <select name="category" class="form-select" style="font-size: 13px;">
+        <option value="ALL" {% if category == 'ALL' %}selected{% endif %}>All Categories</option>
+        {% for cat in categories %}
+          <option value="{{ cat }}" {% if category == cat %}selected{% endif %}>{{ cat }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Food Type Toggle -->
+    <div class="filter-select" style="flex: 0 1 140px;">
+      <select name="food_type" class="form-select" style="font-size: 13px;">
+        <option value="ALL" {% if food_type == 'ALL' %}selected{% endif %}>All Food Types</option>
+        <option value="Vegetarian" {% if food_type == 'Vegetarian' %}selected{% endif %}>Vegetarian</option>
+        <option value="Non-Vegetarian" {% if food_type == 'Non-Vegetarian' %}selected{% endif %}>Non-Vegetarian</option>
+      </select>
+    </div>
+
+    <!-- Location Filter -->
+    <div class="filter-select" style="flex: 0 1 160px;">
+      <input type="text" name="location" class="form-control" placeholder="Filter locality/city..." value="{{ location or '' }}" style="font-size: 13px;">
+    </div>
+
+    <!-- Sort Selector -->
+    <div class="filter-select" style="flex: 0 1 190px;">
+      <select name="sort_by" class="form-select" style="font-size: 13px;">
+        <option value="match" {% if sort_by == 'match' %}selected{% endif %}>Highest Match Score</option>
+        <option value="deadline" {% if sort_by == 'deadline' %}selected{% endif %}>Earliest Deadline</option>
+        <option value="newest" {% if sort_by == 'newest' %}selected{% endif %}>Newest Donations</option>
+      </select>
+    </div>
+
+    <!-- Submit & Clear -->
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn-ss-primary" style="padding: 6px 14px; font-size: 13px;">
+        <i data-lucide="filter" style="width: 14px; height: 14px;"></i> Filter
+      </button>
+      <a href="{{ url_for('ngo.discover') }}" class="btn-ss-outline" style="padding: 6px 10px; font-size: 13px;" title="Reset filters">
+        <i data-lucide="rotate-ccw" style="width: 14px; height: 14px;"></i>
+      </a>
+    </div>
+  </div>
+</form>
+
+<!-- 3-Column Donation Grid -->
+{% if items %}
+  <div class="donation-grid">
+    {% for item, match in items %}
+      <div class="donation-card">
+        <!-- Floating Smart Match Badge -->
+        <div class="badge-match-floating {% if match.score >= 85 %}badge-match-high{% elif match.score >= 70 %}badge-match-med{% else %}badge-match-low{% endif %}">
+          <i data-lucide="sparkles" style="width: 12px; height: 12px;"></i>
+          {{ match.score }}% Match • {{ match.label }}
+        </div>
+
+        <!-- Food Card Image -->
+        <div class="donation-card-img-wrap">
+          {% if item.image_filename %}
+            <img src="{{ url_for('static', filename='images/uploads/' + item.image_filename) }}" alt="{{ item.title }}" class="donation-card-img">
+          {% else %}
+            <div class="donation-card-placeholder">
+              <i data-lucide="utensils" style="width: 32px; height: 32px; color: #D1D5DB;"></i>
+              <span style="font-size: 11px; color: #9CA3AF; font-weight: 500;">Second Serve Verified</span>
+            </div>
+          {% endif %}
+        </div>
+
+        <!-- Card Body -->
+        <div class="donation-card-body">
+          <div class="donation-category-meta">
+            <span class="badge" style="background-color: #F3F4F6; color: #374151; font-size: 11px;">
+              {{ item.category }}
+            </span>
+            <span class="donation-type-dot {% if item.food_type == 'Vegetarian' %}type-veg{% else %}type-nonveg{% endif %}" title="{{ item.food_type }}"></span>
+          </div>
+
+          <h3 class="donation-title">{{ item.title }}</h3>
+
+          <div class="donation-info-list">
+            <div class="donation-info-item">
+              <i data-lucide="package" style="width: 14px; height: 14px;"></i>
+              <strong>{{ item.quantity|int if item.quantity == item.quantity|int else item.quantity }} {{ item.unit }}</strong>
+            </div>
+            <div class="donation-info-item">
+              <i data-lucide="map-pin" style="width: 14px; height: 14px;"></i>
+              <span>{{ item.locality }}, {{ item.city }}</span>
+            </div>
+            <div class="donation-info-item {% if item.is_urgent %}urgent-deadline{% endif %}">
+              <i data-lucide="clock" style="width: 14px; height: 14px;"></i>
+              <span>{{ item.remaining_time_str }} (Cutoff: {{ item.collection_deadline|datetimeformat('%I:%M %p') }})</span>
+            </div>
+          </div>
+
+          <!-- Explainable Match Callout Box -->
+          <div class="explainable-match-box">
+            <strong>Matched:</strong> {{ match.explanation }}
+          </div>
+        </div>
+
+        <!-- Card Footer -->
+        <div class="donation-card-footer">
+          <a href="{{ url_for('ngo.donation_detail', listing_id=item.id) }}" class="btn-ss-outline w-100" style="font-size: 13px; padding: 7px 12px;">
+            <i data-lucide="eye" style="width: 14px; height: 14px;"></i> View Details & Claim
+          </a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="ss-card">
+    <div class="empty-state">
+      <div class="empty-state-icon">
+        <i data-lucide="search-x" style="width: 28px; height: 28px;"></i>
+      </div>
+      <h3 class="empty-state-title">No Food Donations Found</h3>
+      <p class="empty-state-desc">No surplus food listings match your selected search or filter criteria. Try clearing some filters.</p>
+      <a href="{{ url_for('ngo.discover') }}" class="btn-ss-primary">
+        <i data-lucide="rotate-ccw" style="width: 16px; height: 16px;"></i> Reset All Filters
+      </a>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

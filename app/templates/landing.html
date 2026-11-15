@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Second Serve | Smart Food Waste Rescue & NGO Redistribution</title>
+  
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  <style>
+    /* -------------------------------------------------------------
+       SECOND SERVE - LANDING PAGE CUSTOM ENHANCEMENTS
+       Strict Palette: Vibrant Red (#FF0000), Pure White (#FFFFFF),
+       Cool Slate (#F9FAFB), Charcoal (#111827)
+       ------------------------------------------------------------- */
+    :root {
+      --ss-red: #FF0000;
+      --ss-red-deep: #CC0000;
+      --ss-red-light: #FFF1F1;
+      --ss-red-border: #FECACA;
+      --ss-charcoal: #111827;
+      --ss-gray-body: #4B5563;
+      --ss-gray-muted: #6B7280;
+      --ss-border: #E5E7EB;
+      --ss-emerald: #059669;
+      --ss-emerald-light: #ECFDF5;
+    }
+
+    body {
+      background-color: #FFFFFF;
+      color: var(--ss-charcoal);
+      font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow-x: hidden;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* Top Announcement Strip */
+    .top-announcement-strip {
+      background-color: var(--ss-red);
+      color: #FFFFFF;
+      font-size: 13px;
+      font-weight: 600;
+      padding: 9px 16px;
+      text-align: center;
+      position: relative;
+      z-index: 1040;
+    }
+    .top-announcement-strip a {
+      color: #FFFFFF;
+      font-weight: 700;
+      text-decoration: underline;
+      margin-left: 8px;
+    }
+
+    /* Modern SaaS Header */
+    .saas-header {
+      background-color: #FFFFFF;
+      border-bottom: 1px solid var(--ss-border);
+      position: sticky;
+      top: 0;
+      z-index: 1030;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .saas-header .navbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .brand-icon-sq {
+      width: 40px;
+      height: 40px;
+      background-color: var(--ss-red);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #FFFFFF;
+      box-shadow: 0 2px 6px rgba(255, 0, 0, 0.25);
+    }
+    .nav-pill-link {
+      font-size: 14px;
+      font-weight: 600;
+      color: #374151;
+      padding: 8px 16px;
+      border-radius: 6px;
+      transition: all 150ms ease;
+      text-decoration: none;
+    }
+    .nav-pill-link:hover {
+      color: var(--ss-red);
+      background-color: var(--ss-red-light);
+    }
+
+    /* Hero Section */
+    .hero-wrap {
+      background: linear-gradient(180deg, #FFFFFF 0%, #F9FAFB 100%);
+      padding: 64px 0 56px 0;
+      border-bottom: 1px solid var(--ss-border);
+      position: relative;
+    }
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background-color: var(--ss-red-light);
+      border: 1px solid var(--ss-red-border);
+      color: var(--ss-red);
+      font-size: 12.5px;
+      font-weight: 700;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      margin-bottom: 22px;
+    }
+    .hero-eyebrow-dot {
+      width: 8px;
+      height: 8px;
+      background-color: var(--ss-red);
+      border-radius: 50%;
+      box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.2);
+    }
+    .hero-h1 {
+      font-size: 46px;
+      font-weight: 900;
+      line-height: 1.15;
+      color: var(--ss-charcoal);
+      letter-spacing: -0.025em;
+      margin-bottom: 20px;
+    }
+    .hero-h1 .text-red {
+      color: var(--ss-red);
+    }
+    .hero-lead {
+      font-size: 17px;
+      line-height: 1.6;
+      color: var(--ss-gray-body);
+      margin-bottom: 30px;
+      max-width: 540px;
+    }
+    .btn-hero-primary {
+      background-color: var(--ss-red);
+      border: 1px solid var(--ss-red);
+      color: #FFFFFF;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 12px 24px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(255, 0, 0, 0.25);
+      transition: all 150ms ease;
+      text-decoration: none;
+    }
+    .btn-hero-primary:hover {
+      background-color: var(--ss-red-deep);
+      border-color: var(--ss-red-deep);
+      color: #FFFFFF;
+      transform: translateY(-1px);
+    }
+    .btn-hero-outline {
+      background-color: #FFFFFF;
+      border: 1px solid var(--ss-border);
+      color: var(--ss-charcoal);
+      font-size: 15px;
+      font-weight: 700;
+      padding: 12px 22px;
+      border-radius: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 150ms ease;
+      text-decoration: none;
+    }
+    .btn-hero-outline:hover {
+      background-color: #F9FAFB;
+      border-color: #D1D5DB;
+      color: var(--ss-charcoal);
+    }
+
+    /* Custom High-Contrast Outline & Action Buttons */
+    .btn-brand-outline-red {
+      background-color: #FFFFFF;
+      border: 1.5px solid var(--ss-red);
+      color: var(--ss-red);
+      font-weight: 700;
+      border-radius: 8px;
+      transition: all 180ms ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-brand-outline-red:hover,
+    .btn-brand-outline-red:focus,
+    .btn-brand-outline-red:active {
+      background-color: var(--ss-red) !important;
+      border-color: var(--ss-red) !important;
+      color: #FFFFFF !important;
+      box-shadow: 0 4px 12px rgba(255, 0, 0, 0.25);
+      transform: translateY(-1px);
+    }
+    .btn-brand-outline-red:hover *,
+    .btn-brand-outline-red:focus *,
+    .btn-brand-outline-red:active * {
+      color: #FFFFFF !important;
+    }
+
+    .btn-brand-outline-emerald {
+      background-color: #FFFFFF;
+      border: 1.5px solid var(--ss-emerald);
+      color: var(--ss-emerald);
+      font-weight: 700;
+      border-radius: 8px;
+      transition: all 180ms ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-brand-outline-emerald:hover,
+    .btn-brand-outline-emerald:focus,
+    .btn-brand-outline-emerald:active {
+      background-color: var(--ss-emerald) !important;
+      border-color: var(--ss-emerald) !important;
+      color: #FFFFFF !important;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.25);
+      transform: translateY(-1px);
+    }
+    .btn-brand-outline-emerald:hover *,
+    .btn-brand-outline-emerald:focus *,
+    .btn-brand-outline-emerald:active * {
+      color: #FFFFFF !important;
+    }
+
+    .btn-claim-pill {
+      background-color: var(--ss-red-light);
+      border: 1px solid var(--ss-red-border);
+      color: var(--ss-red);
+      font-weight: 800;
+      font-size: 12px;
+      border-radius: 6px;
+      padding: 6px 14px;
+      transition: all 150ms ease;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-claim-pill:hover,
+    .btn-claim-pill:focus,
+    .btn-claim-pill:active {
+      background-color: var(--ss-red) !important;
+      border-color: var(--ss-red) !important;
+      color: #FFFFFF !important;
+      box-shadow: 0 2px 6px rgba(255, 0, 0, 0.2);
+    }
+    .btn-claim-pill:hover *,
+    .btn-claim-pill:focus *,
+    .btn-claim-pill:active * {
+      color: #FFFFFF !important;
+    }
+
+    /* Hero Visual Showcase Composite Card */
+    .hero-showcase-box {
+      background: #FFFFFF;
+      border: 1px solid var(--ss-border);
+      border-radius: 18px;
+      padding: 14px;
+      box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.08);
+      position: relative;
+    }
+    .hero-main-img-card {
+      position: relative;
+      height: 270px;
+      border-radius: 12px;
+      overflow: hidden;
+      background-color: #F3F4F6;
+    }
+    .hero-main-img-card img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+    .hero-img-gradient-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, rgba(0,0,0,0.1) 0%, rgba(17, 24, 39, 0.85) 100%);
+    }
+    .hero-img-caption {
+      position: absolute;
+      bottom: 16px;
+      left: 18px;
+      right: 18px;
+      color: #FFFFFF;
+    }
+    .glass-badge-top-right {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: rgba(255, 0, 0, 0.9);
+      color: #FFFFFF;
+      font-size: 12px;
+      font-weight: 800;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    }
+    .glass-badge-top-left {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      background: rgba(17, 24, 39, 0.85);
+      color: #FFFFFF;
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 5px 12px;
+      border-radius: 6px;
+      backdrop-filter: blur(8px);
+    }
+
+    /* Sub-cards inside hero */
+    .hero-subcard {
+      background: #FFFFFF;
+      border: 1px solid var(--ss-border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      margin-top: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    }
+
+    /* Elevated KPI Stat Row */
+    .kpi-stat-container {
+      background: #FFFFFF;
+      border: 1px solid var(--ss-border);
+      border-radius: 14px;
+      padding: 24px;
+      margin-top: 40px;
+      box-shadow: 0 4px 8px -2px rgba(0,0,0,0.04);
+    }
+    .kpi-col {
+      padding: 10px 18px;
+      border-right: 1px solid #F3F4F6;
+    }
+    .kpi-col:last-child {
+      border-right: none;
+    }
+    .kpi-val {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--ss-charcoal);
+      line-height: 1.1;
+      font-variant-numeric: tabular-nums;
+    }
+    .kpi-val.text-danger {
+      color: var(--ss-red) !important;
+    }
+    .kpi-val.text-success {
+      color: var(--ss-emerald) !important;
+    }
+    .kpi-label-text {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ss-gray-muted);
+      margin-top: 6px;
+    }
+
+    /* Section Headings */
+    .section-wrap {
+      padding: 76px 0;
+    }
+    .sec-tag {
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--ss-red);
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+    .sec-title {
+      font-size: 32px;
+      font-weight: 900;
+      color: var(--ss-charcoal);
+      letter-spacing: -0.015em;
+      margin-bottom: 12px;
+    }
+    .sec-lead {
+      font-size: 16px;
+      color: var(--ss-gray-muted);
+      max-width: 620px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* Food Listing Cards */
+    .food-card-modern {
+      background: #FFFFFF;
+      border: 1px solid var(--ss-border);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      transition: transform 180ms ease, box-shadow 180ms ease;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .food-card-modern:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 20px -3px rgba(0,0,0,0.08);
+      border-color: #FECACA;
+    }
+    .food-img-wrapper {
+      position: relative;
+      height: 190px;
+      overflow: hidden;
+      background-color: #F3F4F6;
+    }
+    .food-img-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 250ms ease;
+    }
+    .food-card-modern:hover .food-img-wrapper img {
+      transform: scale(1.03);
+    }
+    .pill-urgent-timer {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background-color: var(--ss-red);
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 11px;
+      border-radius: 9999px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .pill-category-badge {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(17, 24, 39, 0.85);
+      color: #FFFFFF;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      backdrop-filter: blur(4px);
+    }
+
+    /* Step Card Flow */
+    .step-photo-card {
+      background: #FFFFFF;
+      border: 1px solid var(--ss-border);
+      border-radius: 14px;
+      overflow: hidden;
+      height: 100%;
+      transition: transform 150ms ease, box-shadow 150ms ease;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .step-photo-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 16px -2px rgba(0,0,0,0.07);
+      border-color: var(--ss-red-border);
+    }
+    .step-img-box {
+      height: 140px;
+      overflow: hidden;
+      background-color: #F3F4F6;
+      position: relative;
+    }
+    .step-img-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .step-seq-pill {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--ss-red);
+      color: #FFFFFF;
+      font-weight: 900;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    /* Audience Role Cards */
+    .role-pitch-card {
+      background: #FFFFFF;
+      border: 1px solid var(--ss-border);
+      border-radius: 16px;
+      overflow: hidden;
+      height: 100%;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+    }
+    .role-pitch-card .card-banner-img {
+      height: 160px;
+      overflow: hidden;
+      position: relative;
+    }
+    .role-pitch-card .card-banner-img img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* Footer */
+    .footer-dark {
+      background-color: var(--ss-charcoal);
+      color: #9CA3AF;
+      padding: 64px 0 32px 0;
+      font-size: 14px;
+    }
+    .footer-dark a {
+      color: #D1D5DB;
+      text-decoration: none;
+      transition: color 150ms ease;
+    }
+    .footer-dark a:hover {
+      color: #FFFFFF;
+    }
+
+    /* Mobile Responsive Tweaks */
+    @media (max-width: 991px) {
+      .hero-h1 {
+        font-size: 36px;
+      }
+      .kpi-col {
+        border-right: none;
+        border-bottom: 1px solid #F3F4F6;
+        padding-bottom: 14px;
+        margin-bottom: 10px;
+      }
+      .kpi-col:last-child {
+        border-bottom: none;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 1. TOP ANNOUNCEMENT STRIP -->
+  <div class="top-announcement-strip">
+    <span>⚡ Zero Hunger, Zero Waste: Connect commercial surplus kitchens directly with verified local charities.</span>
+    <a href="{{ url_for('auth.register') }}">Join Network &rarr;</a>
+  </div>
+
+  <!-- 2. STICKY SAAS HEADER -->
+  <header class="saas-header">
+    <div class="container d-flex align-items-center justify-content-between" style="height: 68px;">
+      <!-- Brand Logo -->
+      <a class="navbar-brand" href="{{ url_for('main.index') }}">
+        <div class="brand-icon-sq">
+          <i data-lucide="utensils" style="width: 22px; height: 22px;"></i>
+        </div>
+        <div>
+          <div style="font-size: 19px; font-weight: 900; color: #111827; line-height: 1.1;">Second Serve</div>
+          <div style="font-size: 10.5px; font-weight: 700; color: #6B7280; text-transform: uppercase; letter-spacing: 0.05em;">Smart Food Rescue</div>
+        </div>
+      </a>
+
+      <!-- Desktop Nav Links -->
+      <nav class="d-none d-lg-flex align-items-center gap-1">
+        <a href="#how-it-works" class="nav-pill-link">How It Works</a>
+        <a href="#smart-matching" class="nav-pill-link">Smart Matching</a>
+        <a href="#live-donations" class="nav-pill-link">Available Food</a>
+        <a href="#roles" class="nav-pill-link">Who It's For</a>
+      </nav>
+
+      <!-- Action Buttons -->
+      <div class="d-flex align-items-center gap-2">
+        {% if current_user.is_authenticated %}
+          <a href="{% if current_user.role == 'DONOR' %}{{ url_for('donor.dashboard') }}{% elif current_user.role == 'NGO' %}{{ url_for('ngo.dashboard') }}{% else %}{{ url_for('admin.dashboard') }}{% endif %}" class="btn btn-sm" style="background-color: #FF0000; color: #FFFFFF; font-weight: 700; padding: 8px 18px; border-radius: 6px;">
+            <i data-lucide="layout-dashboard" style="width: 16px; height: 16px; margin-right: 4px;"></i> Workspace
+          </a>
+        {% else %}
+          <a href="{{ url_for('auth.login') }}" class="btn btn-sm btn-outline-secondary" style="font-weight: 600; font-size: 13.5px; padding: 7px 16px; border-color: #D1D5DB;">
+            Sign In
+          </a>
+          <a href="{{ url_for('auth.register') }}" class="btn btn-sm" style="background-color: #FF0000; color: #FFFFFF; font-weight: 700; font-size: 13.5px; padding: 7px 18px; border-radius: 6px;">
+            Get Started
+          </a>
+        {% endif %}
+      </div>
+    </div>
+  </header>
+
+  <!-- 3. BRAND NEW HERO SECTION -->
+  <section class="hero-wrap">
+    <div class="container">
+      <div class="row align-items-center g-5">
+        
+        <!-- Left Hero Content Column -->
+        <div class="col-lg-6">
+          <div class="hero-eyebrow">
+            <span class="hero-eyebrow-dot"></span>
+            <span>100% Deterministic Smart Food Rescue • Bengaluru</span>
+          </div>
+
+          <h1 class="hero-h1">
+            Rescue Surplus Food.<br>
+            Feed Communities in Need.<br>
+            <span class="text-red">Zero Waste.</span>
+          </h1>
+
+          <p class="hero-lead">
+            Second Serve connects restaurants, college canteens, and banquet halls with verified local NGOs through a transparent 4-factor matching algorithm and a live collection pipeline.
+          </p>
+
+          <div class="d-flex flex-wrap align-items-center gap-3">
+            <a href="{{ url_for('auth.register') }}" class="btn-hero-primary">
+              <i data-lucide="heart-handshake" style="width: 18px; height: 18px;"></i>
+              Donate Surplus Food
+            </a>
+            <a href="{{ url_for('auth.register') }}" class="btn-hero-outline">
+              <i data-lucide="shield-check" style="width: 18px; height: 18px; color: #059669;"></i>
+              Register as NGO
+            </a>
+          </div>
+
+          <!-- Trust Badges Row -->
+          <div class="d-flex flex-wrap align-items-center gap-4 mt-4 pt-2">
+            <div class="d-flex align-items-center gap-2" style="font-size: 13px; font-weight: 600; color: #374151;">
+              <i data-lucide="check-circle-2" style="width: 17px; height: 17px; color: #059669;"></i>
+              <span>Zero Double-Claims</span>
+            </div>
+            <div class="d-flex align-items-center gap-2" style="font-size: 13px; font-weight: 600; color: #374151;">
+              <i data-lucide="zap" style="width: 17px; height: 17px; color: #FF0000;"></i>
+              <span>Instant Proximity Match</span>
+            </div>
+            <div class="d-flex align-items-center gap-2" style="font-size: 13px; font-weight: 600; color: #374151;">
+              <i data-lucide="clock" style="width: 17px; height: 17px; color: #D97706;"></i>
+              <span>Expiry Urgency Radar</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Hero Visual Showcase Card (High Quality Photography Composite) -->
+        <div class="col-lg-6">
+          <div class="hero-showcase-box">
+            
+            <!-- Main Hero Photo Card -->
+            <div class="hero-main-img-card">
+              <img src="{{ url_for('static', filename='images/hero/hero_main_banner.jpg') }}" alt="Surplus Food Buffet in Kitchen">
+              <div class="hero-img-gradient-overlay"></div>
+              
+              <!-- Floating Top Badges -->
+              <div class="glass-badge-top-left">
+                <i data-lucide="map-pin" style="width: 12px; height: 12px; vertical-align: -1px; color: #FF0000; margin-right: 2px;"></i>
+                Indiranagar, Bengaluru
+              </div>
+
+              <div class="glass-badge-top-right">
+                <i data-lucide="sparkles" style="width: 13px; height: 13px; vertical-align: -1px; margin-right: 3px;"></i>
+                94% Smart Match
+              </div>
+
+              <!-- Bottom Caption -->
+              <div class="hero-img-caption">
+                <div style="font-size: 12px; font-weight: 700; color: #FCA5A5; text-transform: uppercase; letter-spacing: 0.04em;">Featured Live Rescue</div>
+                <div style="font-size: 18px; font-weight: 800; line-height: 1.25;">Fresh Lunch Buffet Surplus: Basmati Rice & Paneer Curry</div>
+                <div style="font-size: 12px; color: #E5E7EB; margin-top: 4px;">45 Warm Meals • Taj Grand Kitchens • Ready for Pickup</div>
+              </div>
+            </div>
+
+            <!-- Two Sub-Feature Cards Side-by-Side -->
+            <div class="row g-2 mt-1">
+              <div class="col-6">
+                <div class="hero-subcard h-100">
+                  <div class="d-flex align-items-center gap-2 mb-1">
+                    <img src="{{ url_for('static', filename='images/hero/hero_action_box.jpg') }}" alt="Relief NGO" style="width: 38px; height: 38px; border-radius: 8px; object-fit: cover; flex-shrink: 0;">
+                    <div>
+                      <div style="font-size: 12px; font-weight: 800; color: #111827;">Robin Hood Army</div>
+                      <div style="font-size: 11px; color: #059669; font-weight: 700;">● Van En Route</div>
+                    </div>
+                  </div>
+                  <div style="font-size: 11px; color: #6B7280; line-height: 1.35;">Volunteers arriving with thermal insulation crates.</div>
+                </div>
+              </div>
+
+              <div class="col-6">
+                <div class="hero-subcard h-100">
+                  <div class="d-flex align-items-center gap-2 mb-1">
+                    <div style="width: 38px; height: 38px; border-radius: 8px; background-color: #FFF1F1; color: #FF0000; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                      <i data-lucide="cpu" style="width: 20px; height: 20px;"></i>
+                    </div>
+                    <div>
+                      <div style="font-size: 12px; font-weight: 800; color: #111827;">Smart Algorithm</div>
+                      <div style="font-size: 11px; color: #FF0000; font-weight: 700;">Deterministic</div>
+                    </div>
+                  </div>
+                  <div style="font-size: 11px; color: #6B7280; line-height: 1.35;">Cat 40% • Loc 25% • Qty 20% • Urg 15%</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- 4-Column High-Contrast Metric Strip -->
+      <div class="kpi-stat-container">
+        <div class="row g-3 text-center text-md-start">
+          <div class="col-6 col-md-3 kpi-col">
+            <div class="kpi-val text-danger">12,450+</div>
+            <div class="kpi-label-text">Surplus Meals Rescued</div>
+          </div>
+          <div class="col-6 col-md-3 kpi-col">
+            <div class="kpi-val">94.8%</div>
+            <div class="kpi-label-text">Algorithmic Match Accuracy</div>
+          </div>
+          <div class="col-6 col-md-3 kpi-col">
+            <div class="kpi-val">100%</div>
+            <div class="kpi-label-text">Verified Partner Network</div>
+          </div>
+          <div class="col-6 col-md-3 kpi-col">
+            <div class="kpi-val text-success">&lt; 45 min</div>
+            <div class="kpi-label-text">Average Pickup Time</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 4. LIVE AVAILABLE FOOD SHOWCASE (WITH BEST QUALITY IMAGES) -->
+  <section id="live-donations" class="section-wrap" style="background-color: #FFFFFF;">
+    <div class="container">
+      <div class="text-center mb-5">
+        <span class="sec-tag">Real-Time Opportunities</span>
+        <h2 class="sec-title">Fresh Surplus Food Available Now</h2>
+        <p class="sec-lead">Verified surplus listings published by commercial kitchens across Bengaluru, packaged hygienically and ready for NGO collection before expiration.</p>
+      </div>
+
+      <div class="row g-4">
+        {% for listing in featured_listings %}
+          <div class="col-md-4">
+            <div class="food-card-modern">
+              <div class="food-img-wrapper">
+                {% if listing.image_filename %}
+                  <img src="{{ url_for('static', filename='images/uploads/' + listing.image_filename) }}" alt="{{ listing.title }}" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/food/biryani_buffet.jpg') }}';">
+                {% else %}
+                  <img src="{{ url_for('static', filename='images/food/biryani_buffet.jpg') }}" alt="{{ listing.title }}">
+                {% endif %}
+
+                <!-- Category Badge -->
+                <span class="pill-category-badge">{{ listing.category }}</span>
+
+                <!-- Urgency Countdown Pill -->
+                <span class="pill-urgent-timer">
+                  <i data-lucide="clock" style="width: 12px; height: 12px;"></i>
+                  {{ listing.remaining_time_str }}
+                </span>
+              </div>
+
+              <div class="p-4 d-flex flex-column flex-grow-1">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                  <span class="badge" style="background-color: #ECFDF5; color: #065F46; font-size: 11px; font-weight: 700;">
+                    ● {{ listing.food_type }}
+                  </span>
+                  <span style="font-size: 12.5px; font-weight: 700; color: #111827;">
+                    {{ listing.quantity|int if listing.quantity.is_integer() else listing.quantity }} {{ listing.unit }}
+                  </span>
+                </div>
+
+                <h3 style="font-size: 16.5px; font-weight: 800; color: #111827; margin-bottom: 8px; line-height: 1.35;">
+                  {{ listing.title }}
+                </h3>
+
+                <p style="font-size: 13px; color: #6B7280; line-height: 1.5; margin-bottom: 16px; flex-grow: 1;">
+                  {{ listing.description[:110] }}{% if listing.description|length > 110 %}...{% endif %}
+                </p>
+
+                <div class="pt-3 border-top d-flex align-items-center justify-content-between" style="border-color: #F3F4F6 !important;">
+                  <div class="d-flex align-items-center gap-1" style="font-size: 12.5px; color: #4B5563; font-weight: 600;">
+                    <i data-lucide="map-pin" style="width: 14px; height: 14px; color: #FF0000;"></i>
+                    <span>{{ listing.locality }}</span>
+                  </div>
+
+                  <a href="{{ url_for('auth.login') }}" class="btn-claim-pill">
+                    Claim Food &rarr;
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% else %}
+          <div class="col-12 text-center py-5">
+            <div style="font-size: 15px; font-weight: 600; color: #6B7280;">No surplus donations currently available.</div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="text-center mt-5">
+        <a href="{{ url_for('auth.register') }}" class="btn-brand-outline-red px-4 py-2" style="font-size: 14px;">
+          Explore All Surplus Food Listings &rarr;
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. HOW SECOND SERVE WORKS (VISUAL STEPPER WITH PHOTOGRAPHY) -->
+  <section id="how-it-works" class="section-wrap" style="background-color: #F9FAFB; border-top: 1px solid var(--ss-border); border-bottom: 1px solid var(--ss-border);">
+    <div class="container">
+      <div class="text-center mb-5">
+        <span class="sec-tag">Streamlined Flow</span>
+        <h2 class="sec-title">How Second Serve Works</h2>
+        <p class="sec-lead">From kitchen surplus to community meal distribution in 4 transparent, verified, and automated steps.</p>
+      </div>
+
+      <div class="row g-4">
+        <!-- Step 1 -->
+        <div class="col-lg-3 col-md-6">
+          <div class="step-photo-card">
+            <div class="step-img-box">
+              <img src="{{ url_for('static', filename='images/hero/step_prep.jpg') }}" alt="Step 1: Donor Lists Food">
+              <div class="step-seq-pill">1</div>
+            </div>
+            <div class="p-3">
+              <h3 style="font-size: 16px; font-weight: 800; color: #111827; margin-bottom: 6px;">Donor Lists Surplus</h3>
+              <p style="font-size: 13px; color: #6B7280; line-height: 1.5; margin-bottom: 0;">
+                Kitchens specify food category, portions, packaging, hygiene photo, and strict collection deadline in under 60 seconds.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="col-lg-3 col-md-6">
+          <div class="step-photo-card">
+            <div class="step-img-box">
+              <img src="{{ url_for('static', filename='images/hero/step_match.jpg') }}" alt="Step 2: Smart Matching">
+              <div class="step-seq-pill" style="background-color: #111827;">2</div>
+            </div>
+            <div class="p-3">
+              <h3 style="font-size: 16px; font-weight: 800; color: #111827; margin-bottom: 6px;">Smart Matching</h3>
+              <p style="font-size: 13px; color: #6B7280; line-height: 1.5; margin-bottom: 0;">
+                Deterministic algorithm calculates suitability across Category (40%), Location (25%), Quantity (20%), and Urgency (15%).
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="col-lg-3 col-md-6">
+          <div class="step-photo-card">
+            <div class="step-img-box">
+              <img src="{{ url_for('static', filename='images/hero/step_van.jpg') }}" alt="Step 3: 1-Click Atomic Lock">
+              <div class="step-seq-pill" style="background-color: #FF0000;">3</div>
+            </div>
+            <div class="p-3">
+              <h3 style="font-size: 16px; font-weight: 800; color: #111827; margin-bottom: 6px;">1-Click Atomic Lock</h3>
+              <p style="font-size: 13px; color: #6B7280; line-height: 1.5; margin-bottom: 0;">
+                Verified NGO reserves the food with zero duplicate claims. The donation locks instantly to prevent wasted volunteer trips.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="col-lg-3 col-md-6">
+          <div class="step-photo-card">
+            <div class="step-img-box">
+              <img src="{{ url_for('static', filename='images/hero/step_serve.jpg') }}" alt="Step 4: Real-time Collection">
+              <div class="step-seq-pill" style="background-color: #059669;">4</div>
+            </div>
+            <div class="p-3">
+              <h3 style="font-size: 16px; font-weight: 800; color: #111827; margin-bottom: 6px;">Collection Stepper</h3>
+              <p style="font-size: 13px; color: #6B7280; line-height: 1.5; margin-bottom: 0;">
+                Both parties coordinate through a real-time 4-step collection pipeline: Submitted &rarr; Accepted &rarr; Ready &rarr; Collected.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. THE SMART MATCHING ENGINE (VISUAL MATHEMATICAL BREAKDOWN) -->
+  <section id="smart-matching" class="section-wrap" style="background-color: #FFFFFF;">
+    <div class="container">
+      <div class="row align-items-center g-5">
+        
+        <div class="col-lg-6">
+          <span class="sec-tag">Deterministic Intelligence</span>
+          <h2 style="font-size: 32px; font-weight: 900; color: #111827; line-height: 1.2; margin-bottom: 16px;">
+            The Math Behind Second Serve
+          </h2>
+          <p style="font-size: 15.5px; color: #4B5563; line-height: 1.6; margin-bottom: 24px;">
+            Second Serve eliminates guesswork with an <strong>explainable, 100% deterministic rule-based formula</strong>. Every match provides an audible score breakdown.
+          </p>
+
+          <!-- 4 Factor Breakdown Cards -->
+          <div class="d-flex flex-column gap-3 mb-4">
+            
+            <div style="background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 10px; padding: 14px 18px;">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span style="font-size: 14px; font-weight: 700; color: #111827;">1. Category Compatibility</span>
+                <span class="badge" style="background: #FFF1F1; color: #FF0000; font-size: 12px; font-weight: 800;">40% Weight</span>
+              </div>
+              <p style="font-size: 12.5px; color: #6B7280; margin-bottom: 0;">Exact category matches score 100 pts; compatible cooked food types score 60-80 pts.</p>
+            </div>
+
+            <div style="background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 10px; padding: 14px 18px;">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span style="font-size: 14px; font-weight: 700; color: #111827;">2. Geographic Proximity & Locality</span>
+                <span class="badge" style="background: #F3F4F6; color: #374151; font-size: 12px; font-weight: 800;">25% Weight</span>
+              </div>
+              <p style="font-size: 12.5px; color: #6B7280; margin-bottom: 0;">Same locality: 100 pts. Same city: 70 pts. Same district: 40 pts. Prioritizes nearest teams.</p>
+            </div>
+
+            <div style="background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 10px; padding: 14px 18px;">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span style="font-size: 14px; font-weight: 700; color: #111827;">3. Quantity Capacity Fit</span>
+                <span class="badge" style="background: #F3F4F6; color: #374151; font-size: 12px; font-weight: 800;">20% Weight</span>
+              </div>
+              <p style="font-size: 12.5px; color: #6B7280; margin-bottom: 0;">Evaluates batch size against NGO volunteer capacity so food is completely cleared.</p>
+            </div>
+
+            <div style="background: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 10px; padding: 14px 18px;">
+              <div class="d-flex justify-content-between align-items-center mb-1">
+                <span style="font-size: 14px; font-weight: 700; color: #111827;">4. Deadline Urgency</span>
+                <span class="badge" style="background: #FFF1F1; color: #FF0000; font-size: 12px; font-weight: 800;">15% Weight</span>
+              </div>
+              <p style="font-size: 12.5px; color: #6B7280; margin-bottom: 0;">Imminent cutoffs (&lt; 2 hours) jump to the top of NGO discovery radars for emergency dispatch.</p>
+            </div>
+
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div style="background: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 16px; padding: 24px; box-shadow: 0 8px 24px rgba(0,0,0,0.06);">
+            
+            <div class="d-flex align-items-center justify-content-between pb-3 border-bottom mb-3">
+              <div>
+                <span class="badge" style="background: #FF0000; color: #FFFFFF; font-size: 13px; font-weight: 800; padding: 6px 14px; border-radius: 6px;">
+                  94% Match Score
+                </span>
+                <span style="font-size: 13.5px; font-weight: 700; color: #111827; margin-left: 8px;">Excellent Match</span>
+              </div>
+              <span style="font-size: 12px; color: #6B7280; font-weight: 600;">Algorithmic Pairing</span>
+            </div>
+
+            <!-- Two High-Quality Visual Photo Badges -->
+            <div class="row g-2">
+              <div class="col-6">
+                <img src="{{ url_for('static', filename='images/hero/chef_kitchen.jpg') }}" alt="Commercial Kitchen Food Safety" style="width: 100%; height: 140px; object-fit: cover; border-radius: 8px;">
+                <div style="font-size: 11.5px; font-weight: 700; color: #374151; margin-top: 6px; text-align: center;">Donor Food Prep</div>
+              </div>
+              <div class="col-6">
+                <img src="{{ url_for('static', filename='images/hero/community_feeding.jpg') }}" alt="NGO Community Meal Distribution" style="width: 100%; height: 140px; object-fit: cover; border-radius: 8px;">
+                <div style="font-size: 11.5px; font-weight: 700; color: #374151; margin-top: 6px; text-align: center;">NGO Distribution</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. TAILORED FOR DONORS & NGOS ALIKE (WITH HIGH-QUALITY BANNERS) -->
+  <section id="roles" class="section-wrap" style="background-color: #F9FAFB; border-top: 1px solid var(--ss-border); border-bottom: 1px solid var(--ss-border);">
+    <div class="container">
+      <div class="text-center mb-5">
+        <span class="sec-tag">Role-Based Solutions</span>
+        <h2 class="sec-title">Designed for Donors and NGOs Alike</h2>
+        <p class="sec-lead">Dedicated operational workflows crafted for food businesses and humanitarian charities.</p>
+      </div>
+
+      <div class="row g-4">
+        <!-- For Donors -->
+        <div class="col-md-6">
+          <div class="role-pitch-card">
+            <div class="card-banner-img">
+              <img src="{{ url_for('static', filename='images/hero/chef_kitchen.jpg') }}" alt="Food Donor Kitchen">
+              <span style="position: absolute; top: 12px; left: 12px; background: #FF0000; color: #FFFFFF; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 6px;">
+                FOOD DONOR PORTAL
+              </span>
+            </div>
+            <div class="p-4">
+              <h3 style="font-size: 20px; font-weight: 800; color: #111827; margin-bottom: 10px;">For Restaurants, Hotels & Canteens</h3>
+              <p style="font-size: 13.5px; color: #6B7280; line-height: 1.6; margin-bottom: 20px;">
+                Eliminate avoidable food waste and streamline collection pickups without endless phone calls.
+              </p>
+              <ul style="list-style: none; padding-left: 0; margin-bottom: 24px;">
+                <li class="d-flex align-items-center gap-2 mb-2" style="font-size: 13.5px; color: #374151;">
+                  <i data-lucide="check" style="width: 16px; height: 16px; color: #FF0000; font-weight: 800;"></i>
+                  Publish surplus food listings in under 60 seconds with photos
+                </li>
+                <li class="d-flex align-items-center gap-2 mb-2" style="font-size: 13.5px; color: #374151;">
+                  <i data-lucide="check" style="width: 16px; height: 16px; color: #FF0000; font-weight: 800;"></i>
+                  Review incoming NGO requests before approving collection
+                </li>
+                <li class="d-flex align-items-center gap-2 mb-2" style="font-size: 13.5px; color: #374151;">
+                  <i data-lucide="check" style="width: 16px; height: 16px; color: #FF0000; font-weight: 800;"></i>
+                  Real-time 4-step handover tracker with driver contact
+                </li>
+                <li class="d-flex align-items-center gap-2 mb-2" style="font-size: 13.5px; color: #374151;">
+                  <i data-lucide="check" style="width: 16px; height: 16px; color: #FF0000; font-weight: 800;"></i>
+                  Historical audit logs of all meals rescued for sustainability records
+                </li>
+              </ul>
+              <a href="{{ url_for('auth.register') }}" class="btn-brand-outline-red w-100 py-2">
+                Register as Food Donor &rarr;
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- For NGOs -->
+        <div class="col-md-6">
+          <div class="role-pitch-card">
+            <div class="card-banner-img">
+              <img src="{{ url_for('static', filename='images/hero/community_feeding.jpg') }}" alt="Community Feeding Distribution">
+              <span style="position: absolute; top: 12px; left: 12px; background: #059669; color: #FFFFFF; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 6px;">
+                NGO RELIEF NETWORK
+              </span>
+            </div>
+            <div class="p-4">
+              <h3 style="font-size: 20px; font-weight: 800; color: #111827; margin-bottom: 10px;">For Registered Charities & Shelters</h3>
+              <p style="font-size: 13.5px; color: #6B7280; line-height: 1.6; margin-bottom: 20px;">
+                Receive reliable surplus donations matching your dietary requirements and neighborhood routing.
+              </p>
+              <ul style="list-style: none; padding-left: 0; margin-bottom: 24px;">
+                <li class="d-flex align-items-center gap-2 mb-2" style="font-size: 13.5px; color: #374151;">
+                  <i data-lucide="check" style="width: 16px; height: 16px; color: #059669; font-weight: 800;"></i>
+                  Automated Smart Matches tailored to your locality and capacity
+                </li>
+                <li class="d-flex align-items-center gap-2 mb-2" style="font-size: 13.5px; color: #059669; font-weight: 800;">
+                  <i data-lucide="check" style="width: 16px; height: 16px; color: #059669; font-weight: 800;"></i>
+                  Single-claim atomic lock guarantees no volunteer schedule clashes
+                </li>
+                <li class="d-flex align-items-center gap-2 mb-2" style="font-size: 13.5px; color: #374151;">
+                  <i data-lucide="check" style="width: 16px; height: 16px; color: #059669; font-weight: 800;"></i>
+                  Collection Tracker with donor phone numbers and dispatch bay details
+                </li>
+                <li class="d-flex align-items-center gap-2 mb-2" style="font-size: 13.5px; color: #374151;">
+                  <i data-lucide="check" style="width: 16px; height: 16px; color: #059669; font-weight: 800;"></i>
+                  Filter by category (Cooked Meals, Bakery, Produce) & Veg/Non-Veg
+                </li>
+              </ul>
+              <a href="{{ url_for('auth.register') }}" class="btn-brand-outline-emerald w-100 py-2">
+                Register Your NGO &rarr;
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. FOOTER -->
+  <footer class="footer-dark">
+    <div class="container">
+      <div class="row g-4 mb-5">
+        <div class="col-md-6">
+          <div class="d-flex align-items-center gap-2 mb-3">
+            <div style="width: 34px; height: 34px; background: #FF0000; border-radius: 7px; display: flex; align-items: center; justify-content: center; color: #FFFFFF;">
+              <i data-lucide="utensils" style="width: 18px; height: 18px;"></i>
+            </div>
+            <span style="font-size: 19px; font-weight: 900; color: #FFFFFF;">Second Serve</span>
+          </div>
+          <p style="font-size: 13.5px; line-height: 1.6; max-width: 440px; margin-bottom: 16px;">
+            A local-first Smart Food Waste Rescue and NGO Redistribution Management Platform engineered to eliminate food loss through transparent algorithmic matching and real-time collection tracking.
+          </p>
+          <div style="font-size: 12px; color: #9CA3AF;">
+            100% Offline-First • Zero Cloud APIs • Locally Bundled Bootstrap 5 &amp; Lucide
+          </div>
+        </div>
+
+        <div class="col-md-3 col-6">
+          <div style="color: #FFFFFF; font-size: 14px; font-weight: 700; margin-bottom: 14px;">Platform</div>
+          <div class="d-flex flex-column gap-2" style="font-size: 13px;">
+            <a href="#how-it-works">How It Works</a>
+            <a href="#smart-matching">Smart Matching</a>
+            <a href="#live-donations">Available Food</a>
+            <a href="{{ url_for('auth.register') }}">Create Account</a>
+          </div>
+        </div>
+
+        <div class="col-md-3 col-6">
+          <div style="color: #FFFFFF; font-size: 14px; font-weight: 700; margin-bottom: 14px;">Portals</div>
+          <div class="d-flex flex-column gap-2" style="font-size: 13px;">
+            <a href="{{ url_for('auth.login') }}">Food Donor Portal</a>
+            <a href="{{ url_for('auth.login') }}">NGO Portal</a>
+            <a href="{{ url_for('auth.login') }}">Admin Console</a>
+            <a href="{{ url_for('auth.register') }}">NGO Registration</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="pt-4 border-top d-flex flex-wrap justify-content-between align-items-center" style="border-color: #374151 !important; font-size: 12.5px;">
+        <div>&copy; 2026 Second Serve. All rights reserved.</div>
+        <div style="color: #9CA3AF;">Smart Food Waste Rescue &amp; NGO Redistribution System</div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="{{ url_for('static', filename='vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/lucide/lucide.min.js') }}"></script>
+  <script>
+    if (window.lucide) {
+      lucide.createIcons();
+    }
+  </script>
+</body>
+</html>

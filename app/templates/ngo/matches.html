@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+
+{% block title %}Smart Food Matches{% endblock %}
+{% block page_title %}Rule-Based Smart Food Matching{% endblock %}
+
+{% block breadcrumb %}
+  <span>NGO Workspace</span>
+  <i data-lucide="chevron-right" style="width: 12px; height: 12px; color: #9CA3AF;"></i>
+  <span style="color: #111827; font-weight: 600;">Smart Matches</span>
+{% endblock %}
+
+{% block header_actions %}
+  <a href="{{ url_for('ngo.discover') }}" class="btn-ss-outline">
+    <i data-lucide="search" style="width: 18px; height: 18px;"></i>
+    <span>All Listings</span>
+  </a>
+{% endblock %}
+
+{% block content %}
+<!-- Algorithm Transparency Banner -->
+<div class="ss-card mb-4" style="background: linear-gradient(180deg, #FFFFFF 0%, #FFF8F8 100%); border-top: 3px solid #FF0000;">
+  <div class="ss-card-body p-4">
+    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+      <div>
+        <div class="d-flex align-items-center gap-2 mb-1">
+          <span class="badge" style="background-color: #FF0000; color: #FFFFFF; font-size: 11px; font-weight: 700;">TRANSPARENT ALGORITHM</span>
+          <span style="font-size: 13px; font-weight: 700; color: #111827;">Deterministic Rule-Based Matching Matrix</span>
+        </div>
+        <p style="font-size: 13px; color: #4B5563; margin: 0; max-width: 750px;">
+          Second Serve matches available surplus food with NGOs based on 4 verified operational constraints computed entirely locally without external AI APIs:
+        </p>
+      </div>
+      <div class="d-flex gap-2">
+        <span class="pill-status pill-available" style="font-size: 11px;">100% Localhost</span>
+        <span class="pill-status pill-ready" style="font-size: 11px;">Zero External APIs</span>
+      </div>
+    </div>
+
+    <!-- Factor Weights Breakdown -->
+    <div class="row g-2 text-center" style="font-size: 12px;">
+      <div class="col-6 col-md-3">
+        <div style="background-color: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 6px; padding: 10px;">
+          <div style="font-size: 16px; font-weight: 800; color: #FF0000;">40%</div>
+          <div style="font-weight: 600; color: #111827;">Food Category</div>
+          <div style="font-size: 11px; color: #6B7280;">Category compatibility</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div style="background-color: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 6px; padding: 10px;">
+          <div style="font-size: 16px; font-weight: 800; color: #FF0000;">25%</div>
+          <div style="font-weight: 600; color: #111827;">Location Proximity</div>
+          <div style="font-size: 11px; color: #6B7280;">Locality/City alignment</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div style="background-color: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 6px; padding: 10px;">
+          <div style="font-size: 16px; font-weight: 800; color: #FF0000;">20%</div>
+          <div style="font-weight: 600; color: #111827;">Quantity Suitability</div>
+          <div style="font-size: 11px; color: #6B7280;">Capacity match ratio</div>
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <div style="background-color: #FFFFFF; border: 1px solid #E5E7EB; border-radius: 6px; padding: 10px;">
+          <div style="font-size: 16px; font-weight: 800; color: #FF0000;">15%</div>
+          <div style="font-weight: 600; color: #111827;">Deadline Urgency</div>
+          <div style="font-size: 11px; color: #6B7280;">Expiring rescue window</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Preferences Customization Bar -->
+<div class="filter-toolbar">
+  <form method="GET" action="{{ url_for('ngo.matches') }}" class="d-flex flex-wrap align-items-center gap-3 w-100">
+    <div style="font-size: 13px; font-weight: 700; color: #111827; display: flex; align-items: center; gap: 6px;">
+      <i data-lucide="sliders" style="width: 16px; height: 16px; color: #FF0000;"></i>
+      <span>Simulate Match Criteria:</span>
+    </div>
+
+    <div style="flex: 0 1 200px;">
+      <select name="preferred_category" class="form-select" style="font-size: 13px;">
+        <option value="ALL">All Preferred Categories</option>
+        {% for cat in categories %}
+          <option value="{{ cat }}" {% if selected_category == cat %}selected{% endif %}>{{ cat }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div style="flex: 0 1 180px;">
+      <input type="number" step="any" min="1" name="requested_qty" class="form-control" placeholder="Target Quantity (Meals)" value="{{ requested_qty or '' }}" style="font-size: 13px;">
+    </div>
+
+    <button type="submit" class="btn-ss-primary" style="padding: 6px 14px; font-size: 13px;">
+      <i data-lucide="refresh-cw" style="width: 14px; height: 14px;"></i> Re-Rank Matches
+    </button>
+    <a href="{{ url_for('ngo.matches') }}" class="btn-ss-outline" style="padding: 6px 10px; font-size: 13px;" title="Reset simulation">
+      <i data-lucide="rotate-ccw" style="width: 14px; height: 14px;"></i>
+    </a>
+  </form>
+</div>
+
+<!-- Ranked Matches Cards -->
+{% if recommendations %}
+  <div class="row g-4">
+    {% for item, match in recommendations %}
+      <div class="col-lg-6">
+        <div class="ss-card h-100 mb-0 d-flex flex-column" style="border-left: 4px solid {% if match.score >= 85 %}#FF0000{% elif match.score >= 70 %}#EA580C{% else %}#9CA3AF{% endif %};">
+          <div class="ss-card-header d-flex align-items-center justify-content-between">
+            <div>
+              <span class="badge" style="background-color: {% if match.score >= 85 %}#FF0000{% elif match.score >= 70 %}#EA580C{% else %}#4B5563{% endif %}; color: #FFFFFF; font-size: 12px; font-weight: 700; padding: 5px 10px;">
+                <i data-lucide="sparkles" style="width: 12px; height: 12px;"></i>
+                {{ match.score }}% Match • {{ match.label }}
+              </span>
+            </div>
+            <div style="font-size: 12px; color: #6B7280;">
+              Rank #{{ loop.index }}
+            </div>
+          </div>
+
+          {% if item.image_filename %}
+            <div style="height: 140px; overflow: hidden; background-color: #F3F4F6;">
+              <img src="{{ url_for('static', filename='images/uploads/' + item.image_filename) }}" alt="{{ item.title }}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='{{ url_for('static', filename='images/food/buffet_curry.jpg') }}';">
+            </div>
+          {% endif %}
+
+          <div class="ss-card-body flex-grow-1 d-flex flex-column">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <h3 style="font-size: 17px; font-weight: 700; color: #111827; margin: 0;">{{ item.title }}</h3>
+              <span class="badge" style="background-color: #F3F4F6; color: #111827; font-weight: 700; font-size: 13px;">
+                {{ item.quantity|int if item.quantity == item.quantity|int else item.quantity }} {{ item.unit }}
+              </span>
+            </div>
+
+            <p style="font-size: 13px; color: #4B5563; margin-bottom: 12px;">{{ item.description|truncate(120) }}</p>
+
+            <div class="row g-2 mb-3" style="font-size: 12px; color: #4B5563;">
+              <div class="col-6">
+                <i data-lucide="tag" style="width: 13px; height: 13px;"></i> <strong>Category:</strong> {{ item.category }}
+              </div>
+              <div class="col-6">
+                <i data-lucide="map-pin" style="width: 13px; height: 13px;"></i> <strong>Location:</strong> {{ item.locality }}
+              </div>
+              <div class="col-6">
+                <i data-lucide="building" style="width: 13px; height: 13px;"></i> <strong>Donor:</strong> {{ item.donor.organization_name or item.donor.name }}
+              </div>
+              <div class="col-6 {% if item.is_urgent %}text-danger font-weight-bold{% endif %}">
+                <i data-lucide="clock" style="width: 13px; height: 13px;"></i> <strong>Cutoff:</strong> {{ item.remaining_time_str }}
+              </div>
+            </div>
+
+            <!-- Factor Breakdown Bars -->
+            <div style="background-color: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 6px; padding: 12px; margin-bottom: 14px;">
+              <div style="font-size: 11px; font-weight: 700; color: #6B7280; text-transform: uppercase; margin-bottom: 8px;">
+                Algorithmic Factor Breakdown:
+              </div>
+              <div class="row g-2 text-center" style="font-size: 11px;">
+                <div class="col-3">
+                  <div style="font-weight: 700; color: #111827;">{{ match.category_score }} / 100</div>
+                  <div style="color: #6B7280;">Category (40%)</div>
+                </div>
+                <div class="col-3">
+                  <div style="font-weight: 700; color: #111827;">{{ match.location_score }} / 100</div>
+                  <div style="color: #6B7280;">Location (25%)</div>
+                </div>
+                <div class="col-3">
+                  <div style="font-weight: 700; color: #111827;">{{ match.quantity_score }} / 100</div>
+                  <div style="color: #6B7280;">Quantity (20%)</div>
+                </div>
+                <div class="col-3">
+                  <div style="font-weight: 700; color: #111827;">{{ match.urgency_score }} / 100</div>
+                  <div style="color: #6B7280;">Urgency (15%)</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Explainable Match Callout Box -->
+            <div class="explainable-match-box mt-auto">
+              <strong>Transparent Reason:</strong> {{ match.explanation }}
+            </div>
+
+            <div class="mt-3 pt-2 d-flex justify-content-between align-items-center" style="border-top: 1px solid #E5E7EB;">
+              <a href="{{ url_for('ngo.donation_detail', listing_id=item.id) }}" class="btn-ss-primary w-100">
+                <i data-lucide="clipboard-check" style="width: 16px; height: 16px;"></i>
+                <span>Claim This Matched Donation</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="ss-card">
+    <div class="empty-state">
+      <div class="empty-state-icon">
+        <i data-lucide="git-pull-request" style="width: 28px; height: 28px;"></i>
+      </div>
+      <h3 class="empty-state-title">No Compatible Matches Right Now</h3>
+      <p class="empty-state-desc">There are no surplus food listings matching the configured criteria at this moment. You can reset simulation parameters or browse all available donations.</p>
+      <a href="{{ url_for('ngo.discover') }}" class="btn-ss-primary">
+        <i data-lucide="search" style="width: 16px; height: 16px;"></i>
+        <span>Browse All Available Donations</span>
+      </a>
+    </div>
+  </div>
+{% endif %}
+{% endblock %}

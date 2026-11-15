@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+
+{% block title %}Donor Dashboard{% endblock %}
+{% block page_title %}Food Donor Dashboard{% endblock %}
+
+{% block breadcrumb %}
+  <span>Donor Workspace</span>
+  <i data-lucide="chevron-right" style="width: 12px; height: 12px; color: #9CA3AF;"></i>
+  <span style="color: #111827; font-weight: 600;">Overview</span>
+{% endblock %}
+
+{% block header_actions %}
+  <a href="{{ url_for('donor.create') }}" class="btn-ss-primary">
+    <i data-lucide="plus" style="width: 18px; height: 18px;"></i>
+    <span>Publish Donation</span>
+  </a>
+{% endblock %}
+
+{% block content %}
+<!-- 4-Column KPI Row -->
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-top-row">
+      <span class="kpi-label">Active Listings</span>
+      <div class="kpi-icon-container">
+        <i data-lucide="utensils" style="width: 20px; height: 20px;"></i>
+      </div>
+    </div>
+    <div class="kpi-bottom-row">
+      <div class="kpi-number">{{ stats.active_available }}</div>
+      <div class="kpi-context">
+        <span class="text-success font-weight-bold">{{ stats.reserved_active }} currently reserved</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-top-row">
+      <span class="kpi-label">Pending Claim Requests</span>
+      <div class="kpi-icon-container" style="background-color: {% if stats.pending_claims_count > 0 %}#FEF2F2{% else %}#FFF1F1{% endif %};">
+        <i data-lucide="clipboard-check" style="width: 20px; height: 20px; color: {% if stats.pending_claims_count > 0 %}#DC2626{% else %}#FF0000{% endif %};"></i>
+      </div>
+    </div>
+    <div class="kpi-bottom-row">
+      <div class="kpi-number" style="{% if stats.pending_claims_count > 0 %}color: #DC2626;{% endif %}">{{ stats.pending_claims_count }}</div>
+      <div class="kpi-context">
+        <span>Awaiting your review and approval</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-top-row">
+      <span class="kpi-label">Completed Rescues</span>
+      <div class="kpi-icon-container">
+        <i data-lucide="package-check" style="width: 20px; height: 20px;"></i>
+      </div>
+    </div>
+    <div class="kpi-bottom-row">
+      <div class="kpi-number">{{ stats.completed_rescued }}</div>
+      <div class="kpi-context">
+        <span>Verified distributions to NGOs</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-top-row">
+      <span class="kpi-label">Total Quantity Rescued</span>
+      <div class="kpi-icon-container">
+        <i data-lucide="heart" style="width: 20px; height: 20px;"></i>
+      </div>
+    </div>
+    <div class="kpi-bottom-row">
+      <div class="kpi-number">{{ stats.total_meals_saved }}</div>
+      <div class="kpi-context">
+        <span>Units redistributed to community</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Pending Claims Alert Banner if Any -->
+{% if pending_claims %}
+  <div class="ss-card mb-4" style="border-left: 4px solid #FF0000;">
+    <div class="ss-card-header" style="background-color: #FFF1F1;">
+      <h2 class="ss-card-title" style="color: #990000;">
+        <i data-lucide="alert-circle" style="width: 18px; height: 18px; color: #FF0000;"></i>
+        Pending NGO Claim Requests ({{ pending_claims|length }})
+      </h2>
+      <a href="{{ url_for('donor.claims') }}" class="btn btn-sm btn-ss-primary" style="font-size: 12px; padding: 4px 10px;">
+        View All Claims
+      </a>
+    </div>
+    <div class="ss-card-body p-0">
+      <div class="table-responsive">
+        <table class="ss-table">
+          <thead>
+            <tr>
+              <th>Food Listing</th>
+              <th>Requesting NGO</th>
+              <th>Quantity</th>
+              <th>Submitted At</th>
+              <th class="text-end">Immediate Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for claim in pending_claims %}
+              <tr>
+                <td>
+                  <strong>{{ claim.listing.title }}</strong>
+                  <div style="font-size: 11px; color: #6B7280;">{{ claim.listing.category }} • {{ claim.listing.locality }}</div>
+                </td>
+                <td>
+                  <div style="font-weight: 600;">{{ claim.recipient.organization_name or claim.recipient.name }}</div>
+                  <div style="font-size: 11px; color: #6B7280;">Contact: {{ claim.recipient.phone }}</div>
+                </td>
+                <td>
+                  <span class="badge" style="background-color: #F3F4F6; color: #111827; font-size: 12px;">
+                    {{ claim.listing.quantity|int if claim.listing.quantity == claim.listing.quantity|int else claim.listing.quantity }} {{ claim.listing.unit }}
+                  </span>
+                </td>
+                <td>{{ claim.created_at|datetimeformat }}</td>
+                <td class="text-end">
+                  <div class="d-flex justify-content-end gap-2">
+                    <form method="POST" action="{{ url_for('donor.accept', claim_id=claim.id) }}" class="d-inline">
+                      <button type="submit" class="btn btn-sm btn-ss-primary" style="font-size: 12px; padding: 4px 10px;">
+                        <i data-lucide="check" style="width: 14px; height: 14px;"></i> Accept
+                      </button>
+                    </form>
+                    <a href="{{ url_for('donor.claim_detail', claim_id=claim.id) }}" class="btn btn-sm btn-ss-outline" style="font-size: 12px; padding: 4px 10px;">
+                      Review Details
+                    </a>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+<!-- Active Food Listings Section -->
+<div class="ss-card">
+  <div class="ss-card-header">
+    <h2 class="ss-card-title">
+      <i data-lucide="utensils" style="width: 18px; height: 18px; color: #FF0000;"></i>
+      Current Surplus Listings
+    </h2>
+    <a href="{{ url_for('donor.my_donations') }}" class="btn-ss-outline" style="font-size: 12px; padding: 4px 12px;">
+      Manage All ({{ stats.total_listed }})
+    </a>
+  </div>
+  <div class="ss-card-body p-0">
+    {% if active_listings %}
+      <div class="table-responsive">
+        <table class="ss-table">
+          <thead>
+            <tr>
+              <th>Food Title</th>
+              <th>Category</th>
+              <th>Quantity</th>
+              <th>Pickup Location</th>
+              <th>Collection Deadline</th>
+              <th>Status</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for item in active_listings %}
+              <tr>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    {% if item.image_filename %}
+                      <img src="{{ url_for('static', filename='images/uploads/' + item.image_filename) }}" alt="{{ item.title }}" style="width: 38px; height: 38px; object-fit: cover; border-radius: 6px; border: 1px solid #E5E7EB; flex-shrink: 0;" onerror="this.src='{{ url_for('static', filename='images/food/buffet_curry.jpg') }}';">
+                    {% else %}
+                      <div style="width: 38px; height: 38px; border-radius: 6px; background: #FFF1F1; color: #FF0000; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <i data-lucide="utensils" style="width: 18px; height: 18px;"></i>
+                      </div>
+                    {% endif %}
+                    <div>
+                      <div style="font-weight: 600; color: #111827;">{{ item.title }}</div>
+                      <div style="font-size: 11px; color: #6B7280;">Listed {{ item.created_at|datetimeformat }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span class="badge" style="background-color: #F3F4F6; color: #4B5563; font-weight: 500;">
+                    {{ item.category }}
+                  </span>
+                </td>
+                <td>
+                  <span style="font-weight: 700; color: #111827;">
+                    {{ item.quantity|int if item.quantity == item.quantity|int else item.quantity }} {{ item.unit }}
+                  </span>
+                </td>
+                <td>
+                  <div style="font-size: 13px; color: #374151;">{{ item.locality }}, {{ item.city }}</div>
+                </td>
+                <td>
+                  <div class="{% if item.is_urgent %}text-danger font-weight-bold{% endif %}" style="display: flex; align-items: center; gap: 4px; font-size: 13px;">
+                    <i data-lucide="clock" style="width: 14px; height: 14px;"></i>
+                    <span>{{ item.remaining_time_str }}</span>
+                  </div>
+                </td>
+                <td>
+                  {% if item.status == 'AVAILABLE' %}
+                    <span class="pill-status pill-available">Available</span>
+                  {% elif item.status == 'RESERVED' %}
+                    <span class="pill-status pill-reserved">Reserved</span>
+                  {% elif item.status == 'COLLECTED' %}
+                    <span class="pill-status pill-collected">Collected</span>
+                  {% elif item.status == 'EXPIRED' %}
+                    <span class="pill-status pill-expired">Expired</span>
+                  {% else %}
+                    <span class="pill-status pill-cancelled">Cancelled</span>
+                  {% endif %}
+                </td>
+                <td class="text-end">
+                  <div class="d-flex justify-content-end gap-2">
+                    {% if item.status == 'AVAILABLE' %}
+                      <a href="{{ url_for('donor.edit', listing_id=item.id) }}" class="btn btn-sm btn-ss-outline" style="font-size: 12px; padding: 4px 8px;" title="Edit Listing">
+                        <i data-lucide="pencil" style="width: 14px; height: 14px;"></i> Edit
+                      </a>
+                    {% endif %}
+                    {% if item.active_claim %}
+                      <a href="{{ url_for('donor.claim_detail', claim_id=item.active_claim.id) }}" class="btn btn-sm btn-ss-primary" style="font-size: 12px; padding: 4px 8px;">
+                        Track Claim
+                      </a>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-state-icon">
+          <i data-lucide="utensils-crossed" style="width: 28px; height: 28px;"></i>
+        </div>
+        <h3 class="empty-state-title">No Active Food Listings</h3>
+        <p class="empty-state-desc">You currently do not have any surplus food listed. Post surplus meals to connect with nearby verified NGOs.</p>
+        <a href="{{ url_for('donor.create') }}" class="btn-ss-primary">
+          <i data-lucide="plus" style="width: 18px; height: 18px;"></i>
+          <span>Create New Donation</span>
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

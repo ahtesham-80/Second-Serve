@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}My Food Claims{% endblock %}
+{% block page_title %}My Food Claims & Collections{% endblock %}
+
+{% block breadcrumb %}
+  <span>NGO Workspace</span>
+  <i data-lucide="chevron-right" style="width: 12px; height: 12px; color: #9CA3AF;"></i>
+  <span style="color: #111827; font-weight: 600;">My Claims</span>
+{% endblock %}
+
+{% block header_actions %}
+  <a href="{{ url_for('ngo.discover') }}" class="btn-ss-primary">
+    <i data-lucide="plus" style="width: 18px; height: 18px;"></i>
+    <span>Claim New Food</span>
+  </a>
+{% endblock %}
+
+{% block content %}
+<!-- Filter Toolbar -->
+<div class="filter-toolbar">
+  <div class="d-flex flex-wrap gap-2">
+    <a href="{{ url_for('ngo.my_claims', status='ALL') }}" class="btn btn-sm {% if current_filter == 'ALL' %}btn-dark{% else %}btn-outline-secondary{% endif %}">
+      All Claims
+    </a>
+    <a href="{{ url_for('ngo.my_claims', status='PENDING') }}" class="btn btn-sm {% if current_filter == 'PENDING' %}btn-warning text-dark{% else %}btn-outline-secondary{% endif %}">
+      Pending Donor Approval
+    </a>
+    <a href="{{ url_for('ngo.my_claims', status='ACCEPTED') }}" class="btn btn-sm {% if current_filter == 'ACCEPTED' %}btn-info text-white{% else %}btn-outline-secondary{% endif %}">
+      Accepted by Donor
+    </a>
+    <a href="{{ url_for('ngo.my_claims', status='READY_FOR_COLLECTION') }}" class="btn btn-sm {% if current_filter == 'READY_FOR_COLLECTION' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
+      Ready for Pickup
+    </a>
+    <a href="{{ url_for('ngo.my_claims', status='COLLECTED') }}" class="btn btn-sm {% if current_filter == 'COLLECTED' %}btn-success{% else %}btn-outline-secondary{% endif %}">
+      Completed Collections
+    </a>
+  </div>
+</div>
+
+<div class="ss-card">
+  <div class="ss-card-body p-0">
+    {% if claims %}
+      <div class="table-responsive">
+        <table class="ss-table">
+          <thead>
+            <tr>
+              <th>Claim ID</th>
+              <th>Food Item</th>
+              <th>Quantity</th>
+              <th>Donor Organization</th>
+              <th>Pickup Address</th>
+              <th>Status</th>
+              <th>Claimed At</th>
+              <th class="text-end">Tracker</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in claims %}
+              <tr>
+                <td><strong>#{{ c.id }}</strong></td>
+                <td>
+                  <div class="d-flex align-items-center gap-2">
+                    {% if c.listing.image_filename %}
+                      <img src="{{ url_for('static', filename='images/uploads/' + c.listing.image_filename) }}" alt="{{ c.listing.title }}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px; border: 1px solid #E5E7EB; flex-shrink: 0;" onerror="this.src='{{ url_for('static', filename='images/food/buffet_curry.jpg') }}';">
+                    {% else %}
+                      <div style="width: 40px; height: 40px; border-radius: 6px; background: #FFF1F1; color: #FF0000; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                        <i data-lucide="utensils" style="width: 18px; height: 18px;"></i>
+                      </div>
+                    {% endif %}
+                    <div>
+                      <div style="font-weight: 700; color: #111827;">{{ c.listing.title }}</div>
+                      <div style="font-size: 11px; color: #6B7280;">{{ c.listing.category }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <strong>{{ c.listing.quantity|int if c.listing.quantity == c.listing.quantity|int else c.listing.quantity }}</strong> {{ c.listing.unit }}
+                </td>
+                <td>
+                  <div style="font-weight: 600;">{{ c.listing.donor.organization_name or c.listing.donor.name }}</div>
+                  <div style="font-size: 11px; color: #6B7280;">Phone: {{ c.listing.donor.phone }}</div>
+                </td>
+                <td>
+                  <div style="font-size: 13px;">{{ c.listing.locality }}</div>
+                  <div style="font-size: 11px; color: #6B7280;">{{ c.listing.location }}</div>
+                </td>
+                <td>
+                  {% if c.status == 'PENDING' %}
+                    <span class="pill-status pill-pending">Step 1: Submitted</span>
+                  {% elif c.status == 'ACCEPTED' %}
+                    <span class="pill-status pill-ready">Step 2: Accepted</span>
+                  {% elif c.status == 'READY_FOR_COLLECTION' %}
+                    <span class="pill-status pill-available">Step 3: Ready for Pickup</span>
+                  {% elif c.status == 'COLLECTED' %}
+                    <span class="pill-status pill-collected">Step 4: Collected</span>
+                  {% elif c.status == 'REJECTED' %}
+                    <span class="pill-status pill-rejected">Rejected</span>
+                  {% else %}
+                    <span class="pill-status pill-cancelled">Cancelled</span>
+                  {% endif %}
+                </td>
+                <td>{{ c.created_at|datetimeformat }}</td>
+                <td class="text-end">
+                  <a href="{{ url_for('ngo.claim_tracker', claim_id=c.id) }}" class="btn btn-sm btn-ss-primary" style="font-size: 12px; padding: 4px 10px;">
+                    Track Pipeline
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-state-icon">
+          <i data-lucide="clipboard-x" style="width: 28px; height: 28px;"></i>
+        </div>
+        <h3 class="empty-state-title">No Claims Found</h3>
+        <p class="empty-state-desc">You do not have any claims under the selected filter.</p>
+        <a href="{{ url_for('ngo.discover') }}" class="btn-ss-primary">
+          <i data-lucide="search" style="width: 16px; height: 16px;"></i> Discover Food to Claim
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

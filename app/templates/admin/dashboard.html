@@ -1,0 +1,327 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+{% block page_title %}Administration & Platform Monitoring{% endblock %}
+
+{% block breadcrumb %}
+  <span>Administration</span>
+  <i data-lucide="chevron-right" style="width: 12px; height: 12px; color: #9CA3AF;"></i>
+  <span style="color: #111827; font-weight: 600;">Overview</span>
+{% endblock %}
+
+{% block content %}
+<!-- Row 1: Users & NGO KPI Cards -->
+<div class="kpi-grid mb-3">
+  <div class="kpi-card">
+    <div class="kpi-top-row">
+      <span class="kpi-label">Total Users</span>
+      <div class="kpi-icon-container">
+        <i data-lucide="users" style="width: 20px; height: 20px;"></i>
+      </div>
+    </div>
+    <div class="kpi-bottom-row">
+      <div class="kpi-number">{{ stats.total_users }}</div>
+      <div class="kpi-context">
+        <span>{{ stats.total_donors }} Donors • {{ stats.total_ngos }} NGOs</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="kpi-card" style="{% if stats.pending_ngos > 0 %}border-color: #FCA5A5; background-color: #FFFDFD;{% endif %}">
+    <div class="kpi-top-row">
+      <span class="kpi-label">Pending NGO Approvals</span>
+      <div class="kpi-icon-container" style="{% if stats.pending_ngos > 0 %}background-color: #FEF2F2; color: #DC2626;{% endif %}">
+        <i data-lucide="badge-check" style="width: 20px; height: 20px;"></i>
+      </div>
+    </div>
+    <div class="kpi-bottom-row">
+      <div class="kpi-number" style="{% if stats.pending_ngos > 0 %}color: #DC2626;{% endif %}">{{ stats.pending_ngos }}</div>
+      <div class="kpi-context">
+        <span>Require immediate verification</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-top-row">
+      <span class="kpi-label">Total Food Donations</span>
+      <div class="kpi-icon-container">
+        <i data-lucide="utensils" style="width: 20px; height: 20px;"></i>
+      </div>
+    </div>
+    <div class="kpi-bottom-row">
+      <div class="kpi-number">{{ stats.total_donations }}</div>
+      <div class="kpi-context">
+        <span class="text-success font-weight-bold">{{ stats.available_donations }} Available Now</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-top-row">
+      <span class="kpi-label">Completed Collections</span>
+      <div class="kpi-icon-container">
+        <i data-lucide="package-check" style="width: 20px; height: 20px;"></i>
+      </div>
+    </div>
+    <div class="kpi-bottom-row">
+      <div class="kpi-number">{{ stats.completed_collections }}</div>
+      <div class="kpi-context">
+        <span>{{ stats.total_qty_collected }} units verified rescued</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- NGO Verification Queue Table (High Priority Action Area) -->
+<div class="ss-card mb-4" style="border-top: 3px solid #FF0000;">
+  <div class="ss-card-header">
+    <h2 class="ss-card-title">
+      <i data-lucide="badge-check" style="width: 18px; height: 18px; color: #FF0000;"></i>
+      NGO Verification Queue
+      {% if pending_ngos %}
+        <span class="badge" style="background-color: #FF0000; color: #FFFFFF; font-size: 11px;">{{ pending_ngos|length }} Action Required</span>
+      {% endif %}
+    </h2>
+    <a href="{{ url_for('admin.ngos') }}" class="btn-ss-outline" style="font-size: 12px; padding: 4px 12px;">
+      View All NGOs
+    </a>
+  </div>
+
+  <div class="ss-card-body p-0">
+    {% if pending_ngos %}
+      <div class="table-responsive">
+        <table class="ss-table">
+          <thead>
+            <tr>
+              <th>NGO / Organization Name</th>
+              <th>Contact Representative</th>
+              <th>Phone Number</th>
+              <th>District / City</th>
+              <th>Registration Date</th>
+              <th class="text-end">Verification Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for ngo in pending_ngos %}
+              <tr>
+                <td>
+                  <div style="font-weight: 700; color: #111827;">{{ ngo.organization_name or ngo.name }}</div>
+                  <div style="font-size: 11px; color: #6B7280;">{{ ngo.email }}</div>
+                </td>
+                <td>{{ ngo.name }}</td>
+                <td><strong>{{ ngo.phone }}</strong></td>
+                <td>{{ ngo.district }}, {{ ngo.city }}</td>
+                <td>{{ ngo.created_at|dateonly }}</td>
+                <td class="text-end">
+                  <div class="d-flex justify-content-end gap-2">
+                    <form method="POST" action="{{ url_for('admin.approve_ngo', user_id=ngo.id) }}" class="d-inline">
+                      <button type="submit" class="btn btn-sm btn-success" style="font-size: 12px; padding: 4px 12px; background-color: #059669; border-color: #059669;">
+                        <i data-lucide="check" style="width: 14px; height: 14px;"></i> Approve
+                      </button>
+                    </form>
+                    <form method="POST" action="{{ url_for('admin.reject_ngo', user_id=ngo.id) }}" class="d-inline">
+                      <button type="submit" class="btn btn-sm btn-outline-danger" style="font-size: 12px; padding: 4px 10px;">
+                        <i data-lucide="x" style="width: 14px; height: 14px;"></i> Reject
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="p-4 text-center" style="background-color: #FFFFFF;">
+        <i data-lucide="check-circle" style="width: 32px; height: 32px; color: #10B981; margin-bottom: 8px;"></i>
+        <div style="font-size: 14px; font-weight: 700; color: #111827;">Queue Clear</div>
+        <div style="font-size: 12px; color: #6B7280;">All registered NGO accounts have been reviewed and verified.</div>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Analytics & Local Chart.js Section -->
+<div class="row g-4 mb-4">
+  <!-- Chart 1: Status Distribution -->
+  <div class="col-lg-5">
+    <div class="ss-card h-100 mb-0">
+      <div class="ss-card-header">
+        <h3 class="ss-card-title">
+          <i data-lucide="pie-chart" style="width: 18px; height: 18px; color: #FF0000;"></i>
+          Donation Status Distribution
+        </h3>
+      </div>
+      <div class="ss-card-body d-flex flex-column align-items-center justify-content-center p-4">
+        <div style="width: 100%; max-width: 300px; height: 260px; position: relative;">
+          <canvas id="statusChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart 2: Category Volumes -->
+  <div class="col-lg-7">
+    <div class="ss-card h-100 mb-0">
+      <div class="ss-card-header">
+        <h3 class="ss-card-title">
+          <i data-lucide="bar-chart-3" style="width: 18px; height: 18px; color: #FF0000;"></i>
+          Food Rescue Volume by Category
+        </h3>
+      </div>
+      <div class="ss-card-body p-4">
+        <div style="height: 260px; position: relative;">
+          <canvas id="categoryChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Donations Table -->
+<div class="ss-card">
+  <div class="ss-card-header">
+    <h3 class="ss-card-title">
+      <i data-lucide="clock" style="width: 18px; height: 18px; color: #FF0000;"></i>
+      Recent Platform Listings
+    </h3>
+    <a href="{{ url_for('admin.donations') }}" class="btn-ss-outline" style="font-size: 12px; padding: 4px 12px;">
+      View All Donations
+    </a>
+  </div>
+  <div class="ss-card-body p-0">
+    <div class="table-responsive">
+      <table class="ss-table">
+        <thead>
+          <tr>
+            <th>Donation ID</th>
+            <th>Title</th>
+            <th>Donor</th>
+            <th>Quantity</th>
+            <th>Location</th>
+            <th>Deadline</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for d in recent_donations %}
+            <tr>
+              <td><strong>#{{ d.id }}</strong></td>
+              <td><strong>{{ d.title }}</strong></td>
+              <td>{{ d.donor.organization_name or d.donor.name }}</td>
+              <td>{{ d.quantity|int if d.quantity == d.quantity|int else d.quantity }} {{ d.unit }}</td>
+              <td>{{ d.locality }}, {{ d.city }}</td>
+              <td>{{ d.collection_deadline|datetimeformat }}</td>
+              <td>
+                {% if d.status == 'AVAILABLE' %}
+                  <span class="pill-status pill-available">Available</span>
+                {% elif d.status == 'RESERVED' %}
+                  <span class="pill-status pill-reserved">Reserved</span>
+                {% elif d.status == 'COLLECTED' %}
+                  <span class="pill-status pill-collected">Collected</span>
+                {% elif d.status == 'EXPIRED' %}
+                  <span class="pill-status pill-expired">Expired</span>
+                {% else %}
+                  <span class="pill-status pill-cancelled">Cancelled</span>
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  if (typeof Chart === 'undefined') return;
+
+  // Chart 1: Status Distribution Doughnut Chart
+  const statusCtx = document.getElementById('statusChart');
+  if (statusCtx) {
+    new Chart(statusCtx, {
+      type: 'doughnut',
+      data: {
+        labels: {{ charts_data.status_labels|tojson }},
+        datasets: [{
+          data: {{ charts_data.status_values|tojson }},
+          backgroundColor: [
+            '#10B981', // Available (Emerald)
+            '#F59E0B', // Reserved (Amber)
+            '#059669', // Collected (Deep Emerald)
+            '#FF0000', // Expired (Pure Red Brand)
+            '#9CA3AF'  // Cancelled (Neutral Gray)
+          ],
+          borderWidth: 2,
+          borderColor: '#FFFFFF'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: {
+              boxWidth: 12,
+              font: { family: "'Inter', sans-serif", size: 11 },
+              color: '#4B5563'
+            }
+          }
+        },
+        cutout: '65%'
+      }
+    });
+  }
+
+  // Chart 2: Category Breakdown Bar Chart (Strict Red & Neutral palette)
+  const categoryCtx = document.getElementById('categoryChart');
+  if (categoryCtx) {
+    new Chart(categoryCtx, {
+      type: 'bar',
+      data: {
+        labels: {{ charts_data.category_labels|tojson }},
+        datasets: [{
+          label: 'Total Listings',
+          data: {{ charts_data.category_values|tojson }},
+          backgroundColor: '#FF0000',
+          hoverBackgroundColor: '#CC0000',
+          borderRadius: 4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false }
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+            ticks: {
+              font: { family: "'Inter', sans-serif", size: 11 },
+              color: '#6B7280'
+            }
+          },
+          y: {
+            beginAtZero: true,
+            ticks: {
+              precision: 0,
+              font: { family: "'Inter', sans-serif", size: 11 },
+              color: '#6B7280'
+            },
+            grid: {
+              color: '#F3F4F6'
+            }
+          }
+        }
+      }
+    });
+  }
+});
+</script>
+{% endblock %}

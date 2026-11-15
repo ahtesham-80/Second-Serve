@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign In | Second Serve</title>
+  
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap/bootstrap.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+  <style>
+    .auth-container-wide {
+      width: 100%;
+      max-width: 960px;
+      margin: auto;
+      background: #FFFFFF;
+      border-radius: 16px;
+      border: 1px solid #E5E7EB;
+      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.08);
+      overflow: hidden;
+      position: relative;
+    }
+    .auth-left-visual {
+      background: linear-gradient(180deg, rgba(17, 24, 39, 0.75) 0%, rgba(17, 24, 39, 0.95) 100%),
+                  url("{{ url_for('static', filename='images/hero/hero_food_rescue.jpg') }}") center/cover no-repeat;
+      color: #FFFFFF;
+      padding: 48px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 540px;
+    }
+    .auth-right-form {
+      padding: 44px 40px;
+    }
+    .stat-chip {
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      padding: 12px 16px;
+    }
+  </style>
+</head>
+<body class="auth-wrapper py-4">
+
+  <!-- Flash Toast Notifications -->
+  <div class="flash-toasts-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="toast-alert alert-{{ category if category != 'error' else 'danger' }}">
+            <i data-lucide="{% if category == 'success' %}check-circle{% elif category == 'danger' %}alert-circle{% elif category == 'warning' %}alert-triangle{% else %}info{% endif %}" style="width: 18px; height: 18px; flex-shrink: 0; color: {% if category == 'success' %}#10B981{% elif category == 'warning' %}#F59E0B{% elif category == 'danger' %}#FF0000{% else %}#3B82F6{% endif %};"></i>
+            <div style="flex: 1; font-size: 13px; font-weight: 500; color: #111827;">{{ message }}</div>
+            <button type="button" class="btn-close" style="font-size: 10px;" onclick="this.parentElement.remove();"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <div class="container">
+    <div class="auth-container-wide">
+      <!-- Top Brand Red Accent Bar -->
+      <div style="height: 5px; background: #FF0000; width: 100%;"></div>
+
+      <div class="row g-0">
+        
+        <!-- Left Visual Side (Hero & Mission Showcase) -->
+        <div class="col-lg-5 d-none d-lg-block">
+          <div class="auth-left-visual">
+            <div>
+              <div class="d-flex align-items-center gap-2 mb-4">
+                <div style="width: 38px; height: 38px; background: #FF0000; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #FFFFFF;">
+                  <i data-lucide="utensils" style="width: 22px; height: 22px;"></i>
+                </div>
+                <div>
+                  <div style="font-size: 19px; font-weight: 800; color: #FFFFFF; line-height: 1.1;">Second Serve</div>
+                  <div style="font-size: 11px; font-weight: 700; color: #FECACA; text-transform: uppercase; letter-spacing: 0.05em;">Food Waste Rescue</div>
+                </div>
+              </div>
+
+              <span class="badge mb-3" style="background: rgba(255, 0, 0, 0.3); border: 1px solid #FF0000; color: #FFFFFF; font-size: 11.5px; font-weight: 700; padding: 6px 12px; border-radius: 9999px;">
+                ● Zero Food Waste Mission
+              </span>
+
+              <h2 style="font-size: 26px; font-weight: 800; line-height: 1.25; color: #FFFFFF; margin-bottom: 16px;">
+                Connecting Kitchens with Relief Shelters.
+              </h2>
+              <p style="font-size: 14px; color: #D1D5DB; line-height: 1.55;">
+                Every portion rescued is a meal served. Coordinate collections safely with verified non-profits in real time.
+              </p>
+            </div>
+
+            <!-- Stats Chips -->
+            <div class="d-flex flex-column gap-2 my-4">
+              <div class="stat-chip d-flex align-items-center justify-content-between">
+                <span style="font-size: 12.5px; color: #E5E7EB; font-weight: 500;">Meals Rescued</span>
+                <strong style="font-size: 15px; color: #FFFFFF;">12,450+</strong>
+              </div>
+              <div class="stat-chip d-flex align-items-center justify-content-between">
+                <span style="font-size: 12.5px; color: #E5E7EB; font-weight: 500;">Smart Match Precision</span>
+                <strong style="font-size: 15px; color: #FFFFFF;">94% Accuracy</strong>
+              </div>
+              <div class="stat-chip d-flex align-items-center justify-content-between">
+                <span style="font-size: 12.5px; color: #E5E7EB; font-weight: 500;">Conflict Claims</span>
+                <strong style="font-size: 15px; color: #10B981;">0% (Atomic Lock)</strong>
+              </div>
+            </div>
+
+            <div style="font-size: 12px; color: #9CA3AF; border-top: 1px solid rgba(255,255,255,0.15); padding-top: 14px;">
+              <a href="{{ url_for('main.landing') }}" style="color: #FFFFFF; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;">
+                <i data-lucide="arrow-left" style="width: 14px; height: 14px;"></i> Back to Public Homepage
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Form Side -->
+        <div class="col-lg-7">
+          <div class="auth-right-form">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+              <div>
+                <h1 style="font-size: 24px; font-weight: 800; color: #111827; margin-bottom: 4px;">Sign In to Dashboard</h1>
+                <p style="font-size: 13.5px; color: #6B7280; margin-bottom: 0;">Enter your registered credentials to access your portal.</p>
+              </div>
+              <a href="{{ url_for('main.landing') }}" class="btn btn-sm btn-outline-secondary d-lg-none" style="font-size: 12px;">
+                Home
+              </a>
+            </div>
+
+            <!-- Login Form -->
+            <form method="POST" action="{{ url_for('auth.login') }}">
+              <div class="mb-3">
+                <label for="email" class="form-label" style="font-size: 13px; font-weight: 700; color: #374151;">Email Address</label>
+                <div class="input-group">
+                  <span class="input-group-text" style="background-color: #F9FAFB; border-color: #E5E7EB; color: #6B7280;">
+                    <i data-lucide="mail" style="width: 16px; height: 16px;"></i>
+                  </span>
+                  <input type="email" class="form-control" id="email" name="email" placeholder="name@organization.org" required autofocus style="border-color: #E5E7EB; font-size: 14px;">
+                </div>
+              </div>
+
+              <div class="mb-3">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                  <label for="password" class="form-label mb-0" style="font-size: 13px; font-weight: 700; color: #374151;">Password</label>
+                </div>
+                <div class="input-group">
+                  <span class="input-group-text" style="background-color: #F9FAFB; border-color: #E5E7EB; color: #6B7280;">
+                    <i data-lucide="lock" style="width: 16px; height: 16px;"></i>
+                  </span>
+                  <input type="password" class="form-control" id="password" name="password" placeholder="••••••••" required style="border-color: #E5E7EB; font-size: 14px;">
+                </div>
+              </div>
+
+              <div class="mb-4 form-check">
+                <input type="checkbox" class="form-check-input" id="remember" name="remember" style="cursor: pointer;">
+                <label class="form-check-label" for="remember" style="font-size: 13px; color: #4B5563; cursor: pointer;">Stay signed in on this computer</label>
+              </div>
+
+              <button type="submit" class="btn-ss-primary w-100 py-2 mb-3" style="font-size: 15px; font-weight: 700;">
+                <i data-lucide="log-in" style="width: 18px; height: 18px;"></i>
+                <span>Sign In to Workspace</span>
+              </button>
+            </form>
+
+            <!-- Quick Demo Account Fillers -->
+            <div style="background-color: #FFF1F1; border: 1px dashed #FECACA; border-radius: 10px; padding: 14px; margin-bottom: 20px;">
+              <div style="font-size: 11px; font-weight: 800; color: #991B1B; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 10px; display: flex; align-items: center; gap: 5px;">
+                <i data-lucide="key" style="width: 13px; height: 13px; color: #FF0000;"></i> 1-Click Evaluation Logins:
+              </div>
+              <div class="d-flex flex-wrap gap-2">
+                <button type="button" class="btn btn-sm" style="background: #FFFFFF; border: 1px solid #FECACA; color: #111827; font-size: 11.5px; font-weight: 600; border-radius: 6px;" onclick="fillLogin('donor@tajkitchens.com', 'donor123')">
+                  🍴 Taj Kitchens (Donor)
+                </button>
+                <button type="button" class="btn btn-sm" style="background: #FFFFFF; border: 1px solid #FECACA; color: #111827; font-size: 11.5px; font-weight: 600; border-radius: 6px;" onclick="fillLogin('ngo.approved@feedinghope.org', 'ngo123')">
+                  🤝 Feeding Hope (Approved NGO)
+                </button>
+                <button type="button" class="btn btn-sm" style="background: #FFFFFF; border: 1px solid #FECACA; color: #111827; font-size: 11.5px; font-weight: 600; border-radius: 6px;" onclick="fillLogin('admin@secondserve.org', 'admin123')">
+                  🛡️ System Admin
+                </button>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center pt-2 border-top" style="border-color: #F3F4F6; font-size: 13px;">
+              <span style="color: #6B7280;">Don't have an account yet?</span>
+              <a href="{{ url_for('auth.register') }}" style="font-weight: 700; color: #FF0000; text-decoration: none;">Register New Account &rarr;</a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="{{ url_for('static', filename='vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='vendor/lucide/lucide.min.js') }}"></script>
+  <script>
+    if (typeof lucide !== 'undefined' && lucide.createIcons) {
+      lucide.createIcons();
+    }
+    function fillLogin(email, password) {
+      document.getElementById('email').value = email;
+      document.getElementById('password').value = password;
+    }
+  </script>
+</body>
+</html>

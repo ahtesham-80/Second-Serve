@@ -1,0 +1,269 @@
+{% extends 'base.html' %}
+
+{% block title %}NGO Dashboard{% endblock %}
+{% block page_title %}NGO Food Rescue Dashboard{% endblock %}
+
+{% block breadcrumb %}
+  <span>NGO Workspace</span>
+  <i data-lucide="chevron-right" style="width: 12px; height: 12px; color: #9CA3AF;"></i>
+  <span style="color: #111827; font-weight: 600;">Overview</span>
+{% endblock %}
+
+{% block header_actions %}
+  <a href="{{ url_for('ngo.discover') }}" class="btn-ss-primary">
+    <i data-lucide="search" style="width: 18px; height: 18px;"></i>
+    <span>Discover Available Food</span>
+  </a>
+{% endblock %}
+
+{% block content %}
+<!-- Account Verification Alert if Pending -->
+{% if current_user.verification_status == 'PENDING' %}
+  <div class="ss-card mb-4" style="border-left: 4px solid #F59E0B; background-color: #FFFBEB;">
+    <div class="p-3 d-flex align-items-center gap-3">
+      <div style="width: 40px; height: 40px; border-radius: 50%; background-color: #FEF3C7; color: #D97706; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <i data-lucide="clock" style="width: 22px; height: 22px;"></i>
+      </div>
+      <div style="flex: 1;">
+        <div style="font-size: 14px; font-weight: 700; color: #92400E;">NGO Verification Pending Administrative Review</div>
+        <div style="font-size: 12px; color: #78350F;">
+          Your registration for <strong>{{ current_user.organization_name }}</strong> is currently under review by our operations administrators. You can explore surplus food listings and smart match rankings below. Claim submissions will unlock automatically once approved.
+        </div>
+      </div>
+    </div>
+  </div>
+{% elif current_user.verification_status == 'REJECTED' %}
+  <div class="ss-card mb-4" style="border-left: 4px solid #DC2626; background-color: #FEF2F2;">
+    <div class="p-3 d-flex align-items-center gap-3">
+      <div style="width: 40px; height: 40px; border-radius: 50%; background-color: #FEE2E2; color: #DC2626; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+        <i data-lucide="alert-triangle" style="width: 22px; height: 22px;"></i>
+      </div>
+      <div>
+        <div style="font-size: 14px; font-weight: 700; color: #991B1B;">Verification Rejected</div>
+        <div style="font-size: 12px; color: #7F1D1D;">Your NGO verification was declined. Please reach out to administrative support.</div>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+<!-- 4-Column KPI Row -->
+<div class="kpi-grid">
+  <div class="kpi-card">
+    <div class="kpi-top-row">
+      <span class="kpi-label">Available Surplus</span>
+      <div class="kpi-icon-container">
+        <i data-lucide="search" style="width: 20px; height: 20px;"></i>
+      </div>
+    </div>
+    <div class="kpi-bottom-row">
+      <div class="kpi-number">{{ stats.available_count }}</div>
+      <div class="kpi-context">
+        <span>Active unreserved donations nearby</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-top-row">
+      <span class="kpi-label">Active Claims</span>
+      <div class="kpi-icon-container">
+        <i data-lucide="clipboard-check" style="width: 20px; height: 20px;"></i>
+      </div>
+    </div>
+    <div class="kpi-bottom-row">
+      <div class="kpi-number">{{ stats.active_claims_count }}</div>
+      <div class="kpi-context">
+        <span>In progress or ready for pickup</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-top-row">
+      <span class="kpi-label">Completed Collections</span>
+      <div class="kpi-icon-container">
+        <i data-lucide="package-check" style="width: 20px; height: 20px;"></i>
+      </div>
+    </div>
+    <div class="kpi-bottom-row">
+      <div class="kpi-number">{{ stats.completed_collections_count }}</div>
+      <div class="kpi-context">
+        <span>Successfully rescued distributions</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="kpi-card">
+    <div class="kpi-top-row">
+      <span class="kpi-label">Total Rescued Food</span>
+      <div class="kpi-icon-container">
+        <i data-lucide="sparkles" style="width: 20px; height: 20px;"></i>
+      </div>
+    </div>
+    <div class="kpi-bottom-row">
+      <div class="kpi-number">{{ stats.total_food_collected }}</div>
+      <div class="kpi-context">
+        <span>Cumulative meals & units saved</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Active Claims Tracker Banner (If any) -->
+{% if active_claims %}
+  <div class="ss-card mb-4" style="border-left: 4px solid #FF0000;">
+    <div class="ss-card-header" style="background-color: #FFF1F1;">
+      <h2 class="ss-card-title" style="color: #990000;">
+        <i data-lucide="truck" style="width: 18px; height: 18px; color: #FF0000;"></i>
+        In-Progress Collection Tracker ({{ active_claims|length }})
+      </h2>
+      <a href="{{ url_for('ngo.my_claims') }}" class="btn btn-sm btn-ss-primary" style="font-size: 12px; padding: 4px 10px;">
+        View My Claims
+      </a>
+    </div>
+    <div class="ss-card-body p-0">
+      <div class="table-responsive">
+        <table class="ss-table">
+          <thead>
+            <tr>
+              <th>Food Donation</th>
+              <th>Donor Organization</th>
+              <th>Quantity</th>
+              <th>Pickup Locality</th>
+              <th>Current Stage</th>
+              <th class="text-end">Live Tracker</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in active_claims %}
+              <tr>
+                <td>
+                  <strong>{{ c.listing.title }}</strong>
+                  <div style="font-size: 11px; color: #6B7280;">Deadline: {{ c.listing.collection_deadline|datetimeformat('%I:%M %p') }}</div>
+                </td>
+                <td>
+                  <div style="font-weight: 600;">{{ c.listing.donor.organization_name or c.listing.donor.name }}</div>
+                  <div style="font-size: 11px; color: #6B7280;">Phone: {{ c.listing.donor.phone }}</div>
+                </td>
+                <td>
+                  <span class="badge" style="background-color: #F3F4F6; color: #111827;">
+                    {{ c.listing.quantity|int if c.listing.quantity == c.listing.quantity|int else c.listing.quantity }} {{ c.listing.unit }}
+                  </span>
+                </td>
+                <td>{{ c.listing.locality }}</td>
+                <td>
+                  {% if c.status == 'PENDING' %}
+                    <span class="pill-status pill-pending">1: Pending Donor Acceptance</span>
+                  {% elif c.status == 'ACCEPTED' %}
+                    <span class="pill-status pill-ready">2: Donor Accepted</span>
+                  {% elif c.status == 'READY_FOR_COLLECTION' %}
+                    <span class="pill-status pill-available">3: Ready for Pickup!</span>
+                  {% endif %}
+                </td>
+                <td class="text-end">
+                  <a href="{{ url_for('ngo.claim_tracker', claim_id=c.id) }}" class="btn btn-sm btn-ss-primary" style="font-size: 12px; padding: 4px 10px;">
+                    Track Collection
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+{% endif %}
+
+<!-- Top Smart Matching Recommendations -->
+<div class="ss-card">
+  <div class="ss-card-header">
+    <div class="d-flex align-items-center gap-2">
+      <h2 class="ss-card-title">
+        <i data-lucide="git-compare-arrows" style="width: 18px; height: 18px; color: #FF0000;"></i>
+        Smart Match Recommendations
+      </h2>
+      <span class="badge" style="background-color: #FFF1F1; color: #FF0000; font-size: 11px; font-weight: 700;">Rule-Based Algorithm</span>
+    </div>
+    <a href="{{ url_for('ngo.matches') }}" class="btn-ss-outline" style="font-size: 12px; padding: 4px 12px;">
+      View All Recommendations
+    </a>
+  </div>
+
+  <div class="ss-card-body">
+    {% if recommendations %}
+      <div class="donation-grid">
+        {% for item, match in recommendations %}
+          <div class="donation-card">
+            <!-- Floating Smart Match Badge -->
+            <div class="badge-match-floating {% if match.score >= 85 %}badge-match-high{% elif match.score >= 70 %}badge-match-med{% else %}badge-match-low{% endif %}">
+              <i data-lucide="sparkles" style="width: 12px; height: 12px;"></i>
+              {{ match.score }}% Match • {{ match.label }}
+            </div>
+
+            <!-- Card Image -->
+            <div class="donation-card-img-wrap">
+              {% if item.image_filename %}
+                <img src="{{ url_for('static', filename='images/uploads/' + item.image_filename) }}" alt="{{ item.title }}" class="donation-card-img">
+              {% else %}
+                <div class="donation-card-placeholder">
+                  <i data-lucide="utensils" style="width: 32px; height: 32px; color: #D1D5DB;"></i>
+                  <span style="font-size: 11px; color: #9CA3AF; font-weight: 500;">Second Serve Verified</span>
+                </div>
+              {% endif %}
+            </div>
+
+            <!-- Card Body -->
+            <div class="donation-card-body">
+              <div class="donation-category-meta">
+                <span class="badge" style="background-color: #F3F4F6; color: #374151; font-size: 11px;">{{ item.category }}</span>
+                <span class="donation-type-dot {% if item.food_type == 'Vegetarian' %}type-veg{% else %}type-nonveg{% endif %}" title="{{ item.food_type }}"></span>
+              </div>
+
+              <h3 class="donation-title">{{ item.title }}</h3>
+
+              <div class="donation-info-list">
+                <div class="donation-info-item">
+                  <i data-lucide="package" style="width: 14px; height: 14px;"></i>
+                  <strong>{{ item.quantity|int if item.quantity == item.quantity|int else item.quantity }} {{ item.unit }}</strong>
+                </div>
+                <div class="donation-info-item">
+                  <i data-lucide="map-pin" style="width: 14px; height: 14px;"></i>
+                  <span>{{ item.locality }}, {{ item.city }}</span>
+                </div>
+                <div class="donation-info-item {% if item.is_urgent %}urgent-deadline{% endif %}">
+                  <i data-lucide="clock" style="width: 14px; height: 14px;"></i>
+                  <span>{{ item.remaining_time_str }}</span>
+                </div>
+              </div>
+
+              <!-- Explainable Match Callout Box -->
+              <div class="explainable-match-box">
+                <strong>Why Matched:</strong> {{ match.explanation }}
+              </div>
+            </div>
+
+            <!-- Card Footer -->
+            <div class="donation-card-footer">
+              <a href="{{ url_for('ngo.donation_detail', listing_id=item.id) }}" class="btn-ss-outline w-100" style="font-size: 13px; padding: 6px 12px;">
+                View Details & Claim
+              </a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-state-icon">
+          <i data-lucide="check-circle-2" style="width: 28px; height: 28px;"></i>
+        </div>
+        <h3 class="empty-state-title">No Compatible Donations Right Now</h3>
+        <p class="empty-state-desc">All current surplus listings are already claimed or there are no unreserved batches in your local sector. Check back shortly.</p>
+        <a href="{{ url_for('ngo.discover') }}" class="btn-ss-primary">
+          <i data-lucide="search" style="width: 18px; height: 18px;"></i>
+          <span>Browse All Available Food</span>
+        </a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

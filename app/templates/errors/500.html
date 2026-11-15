@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block title %}Server Error (500){% endblock %}
+{% block page_title %}Internal Server Error{% endblock %}
+
+{% block content %}
+<div class="ss-card text-center py-5">
+  <div class="empty-state">
+    <div class="empty-state-icon" style="background-color: #FEF2F2; color: #DC2626;">
+      <i data-lucide="alert-triangle" style="width: 32px; height: 32px;"></i>
+    </div>
+    <h2 class="empty-state-title" style="font-size: 20px;">500 - Internal Server Error</h2>
+    <p class="empty-state-desc">An unexpected server error occurred while processing your request. Database transactions have been safely rolled back.</p>
+    <a href="{{ url_for('main.index') }}" class="btn-ss-primary">
+      <i data-lucide="home" style="width: 16px; height: 16px;"></i> Return to Dashboard
+    </a>
+  </div>
+</div>
+{% endblock %}

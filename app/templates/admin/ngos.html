@@ -1,0 +1,110 @@
+{% extends 'base.html' %}
+
+{% block title %}NGO Approvals & Management{% endblock %}
+{% block page_title %}NGO Verification & Oversight{% endblock %}
+
+{% block breadcrumb %}
+  <span>Administration</span>
+  <i data-lucide="chevron-right" style="width: 12px; height: 12px; color: #9CA3AF;"></i>
+  <span style="color: #111827; font-weight: 600;">NGO Directory</span>
+{% endblock %}
+
+{% block content %}
+<!-- Status Filter Toolbar -->
+<div class="filter-toolbar">
+  <div class="d-flex flex-wrap gap-2">
+    <a href="{{ url_for('admin.ngos', status='ALL') }}" class="btn btn-sm {% if current_filter == 'ALL' %}btn-dark{% else %}btn-outline-secondary{% endif %}">
+      All NGOs
+    </a>
+    <a href="{{ url_for('admin.ngos', status='PENDING') }}" class="btn btn-sm {% if current_filter == 'PENDING' %}btn-danger{% else %}btn-outline-secondary{% endif %}">
+      Pending Verification {% if pending_count > 0 %}<span class="badge bg-white text-danger ms-1">{{ pending_count }}</span>{% endif %}
+    </a>
+    <a href="{{ url_for('admin.ngos', status='APPROVED') }}" class="btn btn-sm {% if current_filter == 'APPROVED' %}btn-success{% else %}btn-outline-secondary{% endif %}">
+      Approved & Active
+    </a>
+    <a href="{{ url_for('admin.ngos', status='REJECTED') }}" class="btn btn-sm {% if current_filter == 'REJECTED' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">
+      Rejected
+    </a>
+  </div>
+</div>
+
+<div class="ss-card">
+  <div class="ss-card-body p-0">
+    {% if ngos %}
+      <div class="table-responsive">
+        <table class="ss-table">
+          <thead>
+            <tr>
+              <th>NGO Organization</th>
+              <th>Representative</th>
+              <th>Phone</th>
+              <th>Location</th>
+              <th>Verification Status</th>
+              <th>Registered</th>
+              <th class="text-end">Verification Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for n in ngos %}
+              <tr>
+                <td>
+                  <div style="font-weight: 700; color: #111827;">{{ n.organization_name or n.name }}</div>
+                  <div style="font-size: 11px; color: #6B7280;">{{ n.email }}</div>
+                </td>
+                <td>{{ n.name }}</td>
+                <td><strong>{{ n.phone }}</strong></td>
+                <td>
+                  <div style="font-size: 13px;">{{ n.locality }}, {{ n.city }}</div>
+                  <div style="font-size: 11px; color: #6B7280;">{{ n.district }}</div>
+                </td>
+                <td>
+                  {% if n.verification_status == 'APPROVED' %}
+                    <span class="pill-status pill-approved">
+                      <i data-lucide="check" style="width: 12px; height: 12px;"></i> Approved
+                    </span>
+                  {% elif n.verification_status == 'PENDING' %}
+                    <span class="pill-status pill-pending">
+                      <i data-lucide="clock" style="width: 12px; height: 12px;"></i> Pending
+                    </span>
+                  {% else %}
+                    <span class="pill-status pill-rejected">
+                      <i data-lucide="x" style="width: 12px; height: 12px;"></i> Rejected
+                    </span>
+                  {% endif %}
+                </td>
+                <td>{{ n.created_at|dateonly }}</td>
+                <td class="text-end">
+                  <div class="d-flex justify-content-end gap-2">
+                    {% if n.verification_status != 'APPROVED' %}
+                      <form method="POST" action="{{ url_for('admin.approve_ngo', user_id=n.id) }}">
+                        <button type="submit" class="btn btn-sm btn-success" style="font-size: 12px; padding: 4px 10px; background-color: #059669; border-color: #059669;">
+                          <i data-lucide="check" style="width: 14px; height: 14px;"></i> Approve
+                        </button>
+                      </form>
+                    {% endif %}
+                    {% if n.verification_status != 'REJECTED' %}
+                      <form method="POST" action="{{ url_for('admin.reject_ngo', user_id=n.id) }}">
+                        <button type="submit" class="btn btn-sm btn-outline-danger" style="font-size: 12px; padding: 4px 10px;">
+                          <i data-lucide="x" style="width: 14px; height: 14px;"></i> Reject
+                        </button>
+                      </form>
+                    {% endif %}
+                  </div>
+                </td>
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="empty-state">
+        <div class="empty-state-icon">
+          <i data-lucide="users-round" style="width: 28px; height: 28px;"></i>
+        </div>
+        <h3 class="empty-state-title">No NGOs Found</h3>
+        <p class="empty-state-desc">No registered NGO accounts match status "{{ current_filter }}".</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

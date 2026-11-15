@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Second Serve{% endblock %} | Smart Food Waste Rescue</title>
+  
+  <!-- Locally Bundled Bootstrap 5 (Zero CDNs) -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap/bootstrap.min.css') }}">
+  
+  <!-- Custom Modern SaaS Red & White Stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+  <!-- Flash Toast Notifications -->
+  <div class="flash-toasts-container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="toast-alert alert-{{ category if category != 'error' else 'danger' }}">
+            <i data-lucide="{% if category == 'success' %}check-circle{% elif category == 'danger' %}alert-circle{% elif category == 'warning' %}alert-triangle{% else %}info{% endif %}" style="width: 18px; height: 18px; flex-shrink: 0; color: {% if category == 'success' %}#10B981{% elif category == 'warning' %}#F59E0B{% elif category == 'danger' %}#FF0000{% else %}#3B82F6{% endif %};"></i>
+            <div style="flex: 1; font-size: 13px; font-weight: 500; color: #111827;">{{ message }}</div>
+            <button type="button" class="btn-close" style="font-size: 10px;" onclick="this.parentElement.remove();"></button>
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <div class="app-wrapper">
+    <!-- Mobile Sidebar Backdrop -->
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
+
+    <!-- Left Fixed Sidebar (250px) -->
+    <aside class="app-sidebar" id="appSidebar">
+      <!-- Brand Header -->
+      <div class="sidebar-header">
+        <div class="brand-icon-box">
+          <i data-lucide="utensils" style="width: 20px; height: 20px;"></i>
+        </div>
+        <div class="brand-info">
+          <div class="brand-title">Second Serve</div>
+          {% if current_user.is_authenticated %}
+            <span class="role-pill role-pill-{{ current_user.role.lower() }}">
+              {{ current_user.role }}
+            </span>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Role-Adaptive Navigation Links -->
+      <nav class="sidebar-nav">
+        {% if current_user.is_authenticated %}
+          {% if current_user.is_donor %}
+            <!-- DONOR NAVIGATION -->
+            <div class="nav-section-title">Donor Workspace</div>
+            <a href="{{ url_for('donor.dashboard') }}" class="sidebar-nav-link {% if request.endpoint == 'donor.dashboard' %}active{% endif %}">
+              <i data-lucide="layout-dashboard" style="width: 18px; height: 18px;"></i>
+              <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('donor.create') }}" class="sidebar-nav-link {% if request.endpoint == 'donor.create' %}active{% endif %}">
+              <i data-lucide="plus-circle" style="width: 18px; height: 18px;"></i>
+              <span>Create Donation</span>
+            </a>
+            <a href="{{ url_for('donor.my_donations') }}" class="sidebar-nav-link {% if request.endpoint in ['donor.my_donations', 'donor.edit'] %}active{% endif %}">
+              <i data-lucide="utensils" style="width: 18px; height: 18px;"></i>
+              <span>My Donations</span>
+            </a>
+            <a href="{{ url_for('donor.claims') }}" class="sidebar-nav-link {% if request.endpoint in ['donor.claims', 'donor.claim_detail'] %}active{% endif %}">
+              <i data-lucide="clipboard-check" style="width: 18px; height: 18px;"></i>
+              <span>Claim Requests</span>
+              {% if donor_pending_claims > 0 %}
+                <span class="sidebar-badge">{{ donor_pending_claims }}</span>
+              {% endif %}
+            </a>
+            <a href="{{ url_for('donor.history') }}" class="sidebar-nav-link {% if request.endpoint == 'donor.history' %}active{% endif %}">
+              <i data-lucide="clock" style="width: 18px; height: 18px;"></i>
+              <span>History</span>
+            </a>
+
+          {% elif current_user.is_ngo %}
+            <!-- NGO NAVIGATION -->
+            <div class="nav-section-title">NGO Workspace</div>
+            <a href="{{ url_for('ngo.dashboard') }}" class="sidebar-nav-link {% if request.endpoint == 'ngo.dashboard' %}active{% endif %}">
+              <i data-lucide="layout-dashboard" style="width: 18px; height: 18px;"></i>
+              <span>Dashboard</span>
+            </a>
+            <a href="{{ url_for('ngo.discover') }}" class="sidebar-nav-link {% if request.endpoint in ['ngo.discover', 'ngo.donation_detail'] %}active{% endif %}">
+              <i data-lucide="search" style="width: 18px; height: 18px;"></i>
+              <span>Discover Food</span>
+            </a>
+            <a href="{{ url_for('ngo.matches') }}" class="sidebar-nav-link {% if request.endpoint == 'ngo.matches' %}active{% endif %}">
+              <i data-lucide="git-compare-arrows" style="width: 18px; height: 18px;"></i>
+              <span>Smart Matches</span>
+            </a>
+            <a href="{{ url_for('ngo.my_claims') }}" class="sidebar-nav-link {% if request.endpoint == 'ngo.my_claims' %}active{% endif %}">
+              <i data-lucide="clipboard-check" style="width: 18px; height: 18px;"></i>
+              <span>My Claims</span>
+            </a>
+            {% set active_claim = current_user.claims.filter_by(status='READY_FOR_COLLECTION').first() %}
+            <a href="{% if active_claim %}{{ url_for('ngo.claim_tracker', claim_id=active_claim.id) }}{% else %}{{ url_for('ngo.my_claims') }}{% endif %}" class="sidebar-nav-link {% if request.endpoint == 'ngo.claim_tracker' %}active{% endif %}">
+              <i data-lucide="package-check" style="width: 18px; height: 18px;"></i>
+              <span>Collection Tracker</span>
+            </a>
+
+          {% elif current_user.is_admin %}
+            <!-- ADMIN NAVIGATION -->
+            <div class="nav-section-title">Administration</div>
+            <a href="{{ url_for('admin.dashboard') }}" class="sidebar-nav-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}">
+              <i data-lucide="chart-no-axes-combined" style="width: 18px; height: 18px;"></i>
+              <span>Overview & Reports</span>
+            </a>
+            <a href="{{ url_for('admin.ngos') }}" class="sidebar-nav-link {% if request.endpoint == 'admin.ngos' %}active{% endif %}">
+              <i data-lucide="badge-check" style="width: 18px; height: 18px;"></i>
+              <span>NGO Approvals</span>
+              {% if admin_pending_ngos > 0 %}
+                <span class="sidebar-badge">{{ admin_pending_ngos }}</span>
+              {% endif %}
+            </a>
+            <a href="{{ url_for('admin.users') }}" class="sidebar-nav-link {% if request.endpoint == 'admin.users' %}active{% endif %}">
+              <i data-lucide="users" style="width: 18px; height: 18px;"></i>
+              <span>All Users</span>
+            </a>
+            <a href="{{ url_for('admin.donations') }}" class="sidebar-nav-link {% if request.endpoint == 'admin.donations' %}active{% endif %}">
+              <i data-lucide="utensils" style="width: 18px; height: 18px;"></i>
+              <span>All Donations</span>
+            </a>
+            <a href="{{ url_for('admin.claims') }}" class="sidebar-nav-link {% if request.endpoint == 'admin.claims' %}active{% endif %}">
+              <i data-lucide="clipboard-check" style="width: 18px; height: 18px;"></i>
+              <span>All Claims</span>
+            </a>
+          {% endif %}
+        {% endif %}
+
+        <div class="nav-section-title">Explore</div>
+        <a href="{{ url_for('main.landing') }}" class="sidebar-nav-link" target="_blank">
+          <i data-lucide="globe" style="width: 18px; height: 18px;"></i>
+          <span>Public Portal</span>
+        </a>
+      </nav>
+
+      <!-- Sidebar Footer User Card -->
+      {% if current_user.is_authenticated %}
+        <div class="sidebar-footer">
+          <div class="user-profile-card">
+            <div class="user-avatar">
+              {{ current_user.name[:2].upper() }}
+            </div>
+            <div class="user-info">
+              <div class="user-name" title="{{ current_user.name }}">{{ current_user.name }}</div>
+              <div class="user-org" title="{{ current_user.organization_name or current_user.email }}">
+                {{ current_user.organization_name or current_user.email }}
+              </div>
+            </div>
+            <a href="{{ url_for('auth.logout') }}" class="btn-logout" title="Log out">
+              <i data-lucide="log-out" style="width: 18px; height: 18px;"></i>
+            </a>
+          </div>
+        </div>
+      {% endif %}
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="app-main">
+      <!-- Top Header Bar (64px) -->
+      <header class="app-header">
+        <div class="header-left">
+          <button type="button" class="btn btn-sm d-lg-none p-0 me-2" id="sidebarToggle" style="border: none; background: transparent;">
+            <i data-lucide="menu" style="width: 22px; height: 22px; color: #111827;"></i>
+          </button>
+          <div class="header-title-box">
+            <h1 class="page-title">{% block page_title %}Dashboard{% endblock %}</h1>
+            <div class="page-breadcrumb">
+              {% block breadcrumb %}
+                <span>Second Serve</span>
+                <i data-lucide="chevron-right" style="width: 12px; height: 12px; color: #9CA3AF;"></i>
+                <span>Workspace</span>
+              {% endblock %}
+            </div>
+          </div>
+        </div>
+
+        <div class="header-right d-flex align-items-center gap-2">
+          <a href="{{ url_for('main.landing') }}" class="btn btn-sm btn-outline-secondary d-none d-md-inline-flex align-items-center gap-1" style="font-size: 12px; font-weight: 600; padding: 5px 12px; border-color: #E5E7EB; text-decoration: none;" target="_blank">
+            <i data-lucide="globe" style="width: 14px; height: 14px; color: #FF0000;"></i>
+            <span>Public Site</span>
+          </a>
+
+          {% if current_user.is_authenticated %}
+            <!-- Quick Role / Verification Status -->
+            {% if current_user.is_ngo %}
+              {% if current_user.verification_status == 'APPROVED' %}
+                <span class="pill-status pill-approved">
+                  <i data-lucide="badge-check" style="width: 14px; height: 14px;"></i> Verified NGO
+                </span>
+              {% elif current_user.verification_status == 'PENDING' %}
+                <span class="pill-status pill-pending" title="Admin approval required to claim donations">
+                  <i data-lucide="clock" style="width: 14px; height: 14px;"></i> Approval Pending
+                </span>
+              {% else %}
+                <span class="pill-status pill-rejected">
+                  <i data-lucide="x-circle" style="width: 14px; height: 14px;"></i> Verification Rejected
+                </span>
+              {% endif %}
+            {% elif current_user.is_donor %}
+              <span class="pill-status pill-approved">
+                <i data-lucide="shield-check" style="width: 14px; height: 14px;"></i> Verified Food Donor
+              </span>
+            {% elif current_user.is_admin %}
+              <span class="pill-status pill-status-danger">
+                <i data-lucide="shield" style="width: 14px; height: 14px;"></i> System Administrator
+              </span>
+            {% endif %}
+
+            <!-- Primary Header Action Block -->
+            {% block header_actions %}
+              {% if current_user.is_donor %}
+                <a href="{{ url_for('donor.create') }}" class="btn-ss-primary">
+                  <i data-lucide="plus" style="width: 18px; height: 18px;"></i>
+                  <span>New Donation</span>
+                </a>
+              {% elif current_user.is_ngo %}
+                <a href="{{ url_for('ngo.discover') }}" class="btn-ss-primary">
+                  <i data-lucide="search" style="width: 18px; height: 18px;"></i>
+                  <span>Find Food</span>
+                </a>
+              {% endif %}
+            {% endblock %}
+          {% endif %}
+        </div>
+      </header>
+
+      <!-- Main Workspace Container -->
+      <div class="app-content">
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+  </div>
+
+  <!-- Locally Bundled Bootstrap 5 Bundle JS -->
+  <script src="{{ url_for('static', filename='vendor/bootstrap/bootstrap.bundle.min.js') }}"></script>
+  <!-- Locally Bundled Lucide Icons JS -->
+  <script src="{{ url_for('static', filename='vendor/lucide/lucide.min.js') }}"></script>
+  <!-- Locally Bundled Chart.js -->
+  <script src="{{ url_for('static', filename='vendor/chartjs/chart.min.js') }}"></script>
+  <!-- Custom Application JS -->
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

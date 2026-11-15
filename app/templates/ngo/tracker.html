@@ -1,0 +1,232 @@
+{% extends 'base.html' %}
+
+{% block title %}Collection Tracker #{{ claim.id }}{% endblock %}
+{% block page_title %}Food Collection Tracker #{{ claim.id }}{% endblock %}
+
+{% block breadcrumb %}
+  <span>NGO Workspace</span>
+  <i data-lucide="chevron-right" style="width: 12px; height: 12px; color: #9CA3AF;"></i>
+  <a href="{{ url_for('ngo.my_claims') }}">My Claims</a>
+  <i data-lucide="chevron-right" style="width: 12px; height: 12px; color: #9CA3AF;"></i>
+  <span style="color: #111827; font-weight: 600;">Tracker #{{ claim.id }}</span>
+{% endblock %}
+
+{% block header_actions %}
+  <a href="{{ url_for('ngo.my_claims') }}" class="btn-ss-outline">
+    <i data-lucide="arrow-left" style="width: 18px; height: 18px;"></i>
+    <span>Back to Claims</span>
+  </a>
+{% endblock %}
+
+{% block content %}
+<div class="row g-4">
+  <div class="col-lg-8">
+    <!-- Stepper Card -->
+    <div class="ss-card mb-4">
+      <div class="ss-card-header">
+        <h2 class="ss-card-title">
+          <i data-lucide="truck" style="width: 18px; height: 18px; color: #FF0000;"></i>
+          Collection & Handover Pipeline
+        </h2>
+        <span class="pill-status {% if claim.status == 'COLLECTED' %}pill-collected{% elif claim.status in ['PENDING', 'ACCEPTED', 'READY_FOR_COLLECTION'] %}pill-ready{% else %}pill-rejected{% endif %}">
+          {{ claim.status }}
+        </span>
+      </div>
+
+      <div class="ss-card-body p-4">
+        <!-- 4-Step Horizontal Stepper -->
+        <div class="claim-stepper">
+          {% set step = claim.step_number %}
+          <!-- Stepper Fill Line -->
+          <div class="stepper-progress-fill" style="width: {% if step == 1 %}0%{% elif step == 2 %}33%{% elif step == 3 %}66%{% elif step == 4 %}100%{% else %}0%{% endif %};"></div>
+
+          <!-- Step 1 -->
+          <div class="stepper-step {% if step > 1 %}completed{% elif step == 1 %}active{% endif %}">
+            <div class="stepper-circle">
+              {% if step > 1 %}<i data-lucide="check" style="width: 18px; height: 18px;"></i>{% else %}1{% endif %}
+            </div>
+            <div class="stepper-step-label">Claim Submitted</div>
+            <div style="font-size: 11px; color: #6B7280;">{{ claim.created_at|datetimeformat('%I:%M %p') }}</div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="stepper-step {% if step > 2 %}completed{% elif step == 2 %}active{% endif %}">
+            <div class="stepper-circle">
+              {% if step > 2 %}<i data-lucide="check" style="width: 18px; height: 18px;"></i>{% else %}2{% endif %}
+            </div>
+            <div class="stepper-step-label">Donor Accepted</div>
+            <div style="font-size: 11px; color: #6B7280;">
+              {% if step >= 2 %}Approved{% else %}Awaiting{% endif %}
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="stepper-step {% if step > 3 %}completed{% elif step == 3 %}active{% endif %}">
+            <div class="stepper-circle">
+              {% if step > 3 %}<i data-lucide="check" style="width: 18px; height: 18px;"></i>{% else %}3{% endif %}
+            </div>
+            <div class="stepper-step-label">Ready for Pickup</div>
+            <div style="font-size: 11px; color: #6B7280;">
+              {% if step >= 3 %}Packed{% else %}Pending{% endif %}
+            </div>
+          </div>
+
+          <!-- Step 4 -->
+          <div class="stepper-step {% if step == 4 %}completed{% endif %}">
+            <div class="stepper-circle">
+              {% if step == 4 %}<i data-lucide="check-check" style="width: 18px; height: 18px;"></i>{% else %}4{% endif %}
+            </div>
+            <div class="stepper-step-label">Collected</div>
+            <div style="font-size: 11px; color: #6B7280;">
+              {% if claim.collected_at %}{{ claim.collected_at|datetimeformat('%I:%M %p') }}{% else %}Handover{% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- NGO Actions Console -->
+        <div class="p-3 mt-4 rounded" style="background-color: #F9FAFB; border: 1px solid #E5E7EB;">
+          <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+            <div>
+              <div style="font-size: 13px; font-weight: 700; color: #111827;">Redistribution Stage Status:</div>
+              <div style="font-size: 12px; color: #6B7280;">
+                {% if claim.status == 'PENDING' %}
+                  Your claim has been delivered to the food donor. You can cancel if your transport plan changes.
+                {% elif claim.status == 'ACCEPTED' %}
+                  The donor accepted your claim! Their kitchen is currently preparing and packing the food for dispatch.
+                {% elif claim.status == 'READY_FOR_COLLECTION' %}
+                  <strong>Food is packed and ready at the donor pickup bay!</strong> Dispatch transport immediately.
+                {% elif claim.status == 'COLLECTED' %}
+                  Collection confirmed and logged in Second Serve records. Thank you for preventing food waste!
+                {% elif claim.status == 'REJECTED' %}
+                  This claim was declined by the donor: {{ claim.rejection_reason or 'No reason provided' }}.
+                {% else %}
+                  This claim was cancelled.
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="d-flex gap-2">
+              {% if claim.status in ['PENDING', 'ACCEPTED'] %}
+                <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelClaimModal">
+                  <i data-lucide="x" style="width: 14px; height: 14px;"></i> Cancel Claim
+                </button>
+              {% endif %}
+
+              {% if claim.status in ['ACCEPTED', 'READY_FOR_COLLECTION'] %}
+                <form method="POST" action="{{ url_for('ngo.confirm_pickup', claim_id=claim.id) }}">
+                  <button type="submit" class="btn btn-sm btn-ss-primary" style="background-color: #059669; border-color: #059669;">
+                    <i data-lucide="check-circle" style="width: 14px; height: 14px;"></i> Confirm Food Collected
+                  </button>
+                </form>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        {% if claim.notes %}
+          <div class="mt-3 p-3 rounded" style="background-color: #F3F4F6; border: 1px solid #E5E7EB;">
+            <div style="font-size: 12px; font-weight: 700; color: #374151; margin-bottom: 2px;">Your Pickup Note:</div>
+            <div style="font-size: 13px; color: #4B5563;">{{ claim.notes }}</div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Food Summary -->
+    <div class="ss-card">
+      <div class="ss-card-header">
+        <h3 class="ss-card-title">
+          <i data-lucide="utensils" style="width: 18px; height: 18px; color: #FF0000;"></i>
+          Claimed Food Batch
+        </h3>
+        <span class="badge" style="background-color: #F3F4F6; color: #111827; font-size: 13px;">
+          {{ claim.listing.quantity|int if claim.listing.quantity == claim.listing.quantity|int else claim.listing.quantity }} {{ claim.listing.unit }}
+        </span>
+      </div>
+      <div class="ss-card-body">
+        {% if claim.listing.image_filename %}
+          <div class="mb-3 rounded overflow-hidden" style="height: 140px; background: #F3F4F6;">
+            <img src="{{ url_for('static', filename='images/uploads/' + claim.listing.image_filename) }}" alt="{{ claim.listing.title }}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='{{ url_for('static', filename='images/food/buffet_curry.jpg') }}';">
+          </div>
+        {% endif %}
+        <h4 style="font-size: 17px; font-weight: 700; color: #111827; margin-bottom: 8px;">{{ claim.listing.title }}</h4>
+        <p style="font-size: 13px; color: #4B5563; margin-bottom: 16px;">{{ claim.listing.description }}</p>
+
+        <div class="row g-3" style="font-size: 13px;">
+          <div class="col-md-6">
+            <span style="color: #6B7280;">Category:</span> <strong>{{ claim.listing.category }}</strong>
+          </div>
+          <div class="col-md-6">
+            <span style="color: #6B7280;">Dietary Type:</span> <strong>{{ claim.listing.food_type }}</strong>
+          </div>
+          <div class="col-md-6">
+            <span style="color: #6B7280;">Strict Collection Cutoff:</span> <strong class="text-danger">{{ claim.listing.collection_deadline|datetimeformat }}</strong>
+          </div>
+          <div class="col-md-6">
+            <span style="color: #6B7280;">Time Remaining:</span> <strong>{{ claim.listing.remaining_time_str }}</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right Sidebar Column: Donor Location & Contact -->
+  <div class="col-lg-4">
+    <div class="ss-card">
+      <div class="ss-card-header">
+        <h3 class="ss-card-title">
+          <i data-lucide="map-pin" style="width: 18px; height: 18px; color: #FF0000;"></i>
+          Pickup Bay Location
+        </h3>
+        <span class="pill-status pill-approved">Verified Donor</span>
+      </div>
+      <div class="ss-card-body">
+        <div style="font-size: 16px; font-weight: 700; color: #111827;">{{ claim.listing.donor.organization_name or claim.listing.donor.name }}</div>
+        <div style="font-size: 12px; color: #6B7280; margin-bottom: 12px;">Contact: {{ claim.listing.donor.name }}</div>
+
+        <div style="background-color: #F9FAFB; border: 1px solid #E5E7EB; border-radius: 6px; padding: 12px; margin-bottom: 14px;">
+          <div style="font-size: 11px; text-transform: uppercase; font-weight: 700; color: #6B7280; margin-bottom: 4px;">Collection Address</div>
+          <div style="font-size: 13px; font-weight: 600; color: #111827;">{{ claim.listing.location }}</div>
+          <div style="font-size: 12px; color: #4B5563;">{{ claim.listing.locality }}, {{ claim.listing.city }}, {{ claim.listing.district }}</div>
+        </div>
+
+        <div style="font-size: 13px; display: flex; flex-direction: column; gap: 8px;">
+          <div>
+            <span style="font-size: 11px; text-transform: uppercase; font-weight: 600; color: #6B7280; display: block;">Donor Phone Number</span>
+            <strong style="color: #111827;">{{ claim.listing.donor.phone }}</strong>
+          </div>
+          <div>
+            <span style="font-size: 11px; text-transform: uppercase; font-weight: 600; color: #6B7280; display: block;">Official Email</span>
+            <span style="color: #111827;">{{ claim.listing.donor.email }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Cancel Claim Modal -->
+<div class="modal fade" id="cancelClaimModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title font-weight-bold">Cancel Food Claim</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <form method="POST" action="{{ url_for('ngo.cancel', claim_id=claim.id) }}">
+        <div class="modal-body">
+          <p>Are you sure you want to cancel this claim? The surplus food will be released back to <strong>AVAILABLE</strong> status so another local NGO can rescue it.</p>
+          <div class="mb-3">
+            <label for="cancelReason" class="form-label" style="font-size: 13px; font-weight: 600;">Reason for Cancellation</label>
+            <input type="text" class="form-control" id="cancelReason" name="reason" placeholder="e.g. Volunteer vehicle breakdown, capacity full">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Keep Claim</button>
+          <button type="submit" class="btn btn-danger">Yes, Cancel Claim</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
